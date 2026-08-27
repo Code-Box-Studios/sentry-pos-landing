@@ -21,6 +21,9 @@ const eslintConfig = [
       "src/migrations/**",
       "src/payload-types.ts",
       "src/app/(payload)/cms/importMap.js",
+      // Rendered pixel reference and its generated design-canvas runtime — vendored artefacts,
+      // not app source.
+      "design/**",
     ],
   },
 ];
