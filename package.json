@@ -17,13 +17,17 @@
     "@payloadcms/db-postgres": "^3.88.0",
     "@payloadcms/next": "^3.88.0",
     "@payloadcms/richtext-lexical": "^3.88.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "graphql": "^17.0.2",
+    "lucide-react": "^1.41.0",
     "next": "15.5.23",
     "payload": "^3.88.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "server-only": "^0.0.1",
-    "sharp": "^0.34.5"
+    "sharp": "^0.34.5",
+    "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

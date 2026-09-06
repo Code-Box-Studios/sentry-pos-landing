@@ -61,6 +61,34 @@
 
   --radius-lg: 12px;
   --radius-xl: 16px;
+
+  /* -----------------------------------------------------------------------------------------
+     shadcn/ui semantic layer — portal only. Any primitive added by the shadcn CLI references
+     these names, so every one of them resolves to a Sentry token from the block above.
+     The values are repeated as literals rather than written as var(--color-ink): `@theme
+     inline` does not emit its variables to :root, so a var() reference here would resolve to
+     nothing at runtime. Each line names the token it mirrors — change both together.
+     ----------------------------------------------------------------------------------------- */
+  --color-background: #ffffff;            /* canvas */
+  --color-foreground: #001e2b;            /* ink */
+  --color-card: #ffffff;                  /* canvas */
+  --color-card-foreground: #001e2b;       /* ink */
+  --color-popover: #ffffff;               /* canvas */
+  --color-popover-foreground: #001e2b;    /* ink */
+  --color-primary: #00684a;               /* brand-green-dark — carries white text at AA */
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #edf1f0;             /* surface-soft */
+  --color-secondary-foreground: #001e2b;  /* ink */
+  --color-muted: #f9fbfa;                 /* surface */
+  --color-muted-foreground: #5c6c75;      /* steel */
+  --color-accent: #e3fcf7;                /* brand-green-soft */
+  --color-accent-foreground: #00684a;     /* brand-green-dark */
+  --color-destructive: #b1371f;           /* danger */
+  --color-destructive-foreground: #ffffff;
+  --color-border: #e8edeb;                /* hairline */
+  --color-input: #c1c7c6;                 /* hairline-strong */
+  --color-ring: #00a35c;                  /* brand-green-mid */
+  --radius: 12px;                         /* radius-lg */
 }
 
 /* Borders and muted text on the deep-teal bands. Tailwind can express these inline, but naming them
