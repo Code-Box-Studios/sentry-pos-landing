@@ -79,3 +79,112 @@ export interface Paginated<T> {
   total: number;
   totalPages: number;
 }
+
+export interface Category {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  businessId: string;
+  name: string;
+  sortOrder: number;
+}
+
+/** The API's spelling. Not "each" — the POS terminal's own vocabulary differs. */
+export type SoldBy = "unit" | "weight";
+
+export interface Variant {
+  id: string;
+  productId: string;
+  name: string;
+  sku: string | null;
+  barcode: string | null;
+  priceC: number;
+  costC: number | null;
+}
+
+export interface Product {
+  id: string;
+  businessId: string;
+  categoryId: string;
+  name: string;
+  sku: string | null;
+  barcode: string | null;
+  priceC: number;
+  costC: number | null;
+  soldBy: SoldBy;
+  lowStockThreshold: number | null;
+  imagePath: string | null;
+  trackStock: boolean;
+  trackExpiry: boolean;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  variants: Variant[];
+}
+
+export interface Modifier {
+  id: string;
+  groupId: string;
+  name: string;
+  priceDeltaC: number;
+}
+
+export interface ModifierGroup {
+  id: string;
+  businessId: string;
+  name: string;
+  minSelect: number;
+  maxSelect: number;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  modifiers: Modifier[];
+}
+
+export type DiscountKind = "percent" | "fixed";
+export type DiscountAppliesTo = "line" | "order" | "both";
+
+export interface Discount {
+  id: string;
+  businessId: string;
+  name: string;
+  kind: DiscountKind;
+  /** 1-100 when kind is "percent"; centavos when kind is "fixed". */
+  value: number;
+  appliesTo: DiscountAppliesTo;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
+export interface StockLevel {
+  productId: string;
+  productName: string;
+  variantId: string | null;
+  variantName: string | null;
+  qty: number;
+}
+
+export interface StockMovement {
+  id: string;
+  productId: string;
+  variantId: string | null;
+  type: string;
+  qtyDelta: number;
+  unitCostC: number | null;
+  refId: string;
+}
+
+export interface Terminal {
+  id: string;
+  branchId: string;
+  name: string;
+  code: string;
+  pairedAt: string;
+  lastSeenAt: string | null;
+  /** False once remotely unpaired — the device 401s on its next request. */
+  paired: boolean;
+}
