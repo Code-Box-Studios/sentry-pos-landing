@@ -9,16 +9,20 @@ import { Nav, type NavItem } from "./nav";
 export function AppShell({
   title,
   nav,
+  aside,
   children,
 }: {
   title: string;
   nav: NavItem[];
+  /** Rendered between the title and the nav — the business switcher lives here. */
+  aside?: ReactNode;
   children: ReactNode;
 }) {
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[16rem_1fr]">
       <aside className="border-b border-hairline bg-card p-4 lg:border-b-0 lg:border-r">
         <p className="px-3 pb-3 text-sm font-semibold tracking-tight text-ink">{title}</p>
+        {aside}
         <Nav items={nav} />
       </aside>
 
