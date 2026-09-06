@@ -272,8 +272,9 @@ the POS terminal is the tablet one.
 ### Catalog
 
 The largest surface. A product carries a name, category, price (integer centavos),
-`soldBy` (`each` or `weight`), `trackStock`, an optional SKU and barcode, and either a
-flat price or variants.
+`soldBy` (`unit` or `weight` — the API's spelling, not `each`), `trackStock`,
+`trackExpiry`, `active`, an optional SKU, barcode, cost and low-stock threshold, and
+either a flat price or variants.
 
 - **Products list** — searchable and filterable by category, with price and stock status
   per row.
@@ -298,11 +299,15 @@ flat price or variants.
 
 ### Discounts and settings
 
-- **Discounts** — percentage or fixed amount, active window, scope. The SC/PWD rule is
-  the API's, not the portal's: a line takes SC/PWD *or* a promo, whichever is higher,
-  never both.
-- **Settings** — set the refund PIN. Owner-wide. Four wrong attempts on a terminal lock
-  it for five minutes.
+- **Discounts** — a name, a `kind` (`percent` or `fixed`), a `value` that means 1–100 for
+  a percentage and centavos for a fixed amount, an `appliesTo` scope (`line`, `order` or
+  `both`), and an `active` flag. There is no scheduled window in the data model, so the UI
+  must not imply one. The SC/PWD rule is the API's, not the portal's: a line takes SC/PWD
+  *or* a promo, whichever is higher, never both.
+- **Settings** — the refund PIN (owner-wide, exactly 6 digits; four wrong attempts on a
+  terminal lock it for five minutes) and per-business settings, which ride the same
+  `PATCH /portal/businesses/:id` as the business itself: tax and service-charge rates,
+  day-start time, misc items, expiry warning days, and receipt header and footer.
 
 ### Activity log
 
