@@ -117,6 +117,17 @@ per request, before any render, and is the only place that can be relied on to d
 Middleware also skips refresh on prefetches, since a prefetch racing a real navigation is the one
 way two refreshes could overlap.
 
+### Replace-set writes
+
+A product's `variants`, a modifier group's `modifiers` and a product's linked `groupIds` are
+each sent as the **complete desired list**. Present replaces, absent leaves alone, `[]`
+clears. A form that shows only some of them must omit the key rather than post a partial
+list — posting a subset deletes the rest. The product editor gets away with always sending
+`variants` precisely because it always renders every one of them.
+
+Related API rule, enforced in the stock picker: a product that has variants can only hold
+stock through them. Receiving or adjusting against the bare product is a 422.
+
 ### Development mail
 
 The backend has no `RESEND_API_KEY` in development, so invites and password resets are **not
@@ -137,6 +148,17 @@ pnpm test
 `PORTAL_E2E_API_URL` is set. It proves the contract the unit suite cannot see: that every endpoint
 the admin panel calls exists, accepts what we send, and returns what we expect.
 
+There are two live suites. The **owner** one needs no TOTP and runs unattended:
+
+```bash
+PORTAL_E2E_API_URL=http://localhost:4000/v1 \
+PORTAL_E2E_OWNER_EMAIL=maria@kapediaria.ph \
+PORTAL_E2E_OWNER_PASSWORD=sentry-demo \
+pnpm test:integration src/test/integration/live-portal.test.ts
+```
+
+The **admin** one needs a live six-digit code, so run it promptly — the code lasts 30 seconds:
+
 ```bash
 PORTAL_E2E_API_URL=http://localhost:4000/v1 \
 PORTAL_E2E_ADMIN_EMAIL=admin@sentry.local \
@@ -145,8 +167,11 @@ PORTAL_E2E_ADMIN_TOTP=123456 \
 pnpm test:integration
 ```
 
-The TOTP code is live for 30 seconds, so run it promptly. The admin must already have enrolled an
-authenticator; the suite says so plainly if not.
+The admin must already have enrolled an authenticator; the suite says so plainly if not. Set
+`PORTAL_E2E_STAMP` to force a fresh set of test record names on a re-run.
+
+The owner suite creates a category, a product, a branch and some stock in the **demo**
+business, then deletes them. It leaves the refund PIN set to the seeded `123456`.
 
 ## Editing the landing copy
 
@@ -183,10 +208,13 @@ The repo name no longer describes everything in it — the authenticated app mov
 than becoming a fourth deployment. The cost of that choice is a shared blast radius: a build break
 in the marketing site takes the portal down with it, and vice versa.
 
-**What the portal does not do yet:** catalog (products, variants, categories, modifier groups),
-discounts, refund PIN, branches, stock and terminals. Those are planned in
-[`docs/superpowers/plans/`](docs/superpowers/plans/). Dashboard, analytics, notifications, stock
-transfers, CSV export and staff roles are further out — the API has no endpoints for them.
+**What the portal does not do yet:** dashboard, analytics, notifications and low-stock alerts,
+inter-branch stock transfers, CSV export, staff accounts and roles, and product images. Every one
+of those needs backend work that does not exist — the API has no endpoints for them.
+
+One gap inside what is built: the API has no read for a product's linked modifier groups (they
+come back only from the PUT), so that editor cannot show the current selection and says so on
+screen. It goes away when `GET /portal/products/:id` starts returning them.
 
 `project-spec.md` in `sentry-pos-fe` remains the system-wide source of truth for architecture,
 tenancy and money rules. [`design-spec.md`](design-spec.md) is copied here so this repo stands on

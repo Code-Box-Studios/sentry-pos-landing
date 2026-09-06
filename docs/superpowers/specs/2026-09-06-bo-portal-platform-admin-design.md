@@ -2,7 +2,12 @@
 
 **Date:** 2026-09-06
 **Repo:** `sentry-pos-landing`
-**Status:** approved, ready for planning
+**Status:** built. Delivered by two plans —
+[`2026-09-06-portal-foundation-and-admin.md`](../plans/2026-09-06-portal-foundation-and-admin.md)
+(auth, shell, platform admin) and
+[`2026-09-06-portal-catalog-and-operations.md`](../plans/2026-09-06-portal-catalog-and-operations.md)
+(catalog, discounts, settings, branches, stock, terminals, activity). The non-goals in §1 are
+unchanged: none of them became possible.
 
 ## 1. What this is
 
