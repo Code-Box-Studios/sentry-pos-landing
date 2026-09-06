@@ -32,6 +32,7 @@ export default async function BusinessLayout({
       // pointing at a page that does not exist yet is just a link to a 404.
       nav={[
         { href: base, label: "Overview" },
+        { href: `${base}/catalog`, label: "Products" },
         { href: `${base}/categories`, label: "Categories" },
         { href: "/portal", label: "← All businesses" },
       ]}
