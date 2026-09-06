@@ -8,7 +8,7 @@ import { getBranch, getStock, listProducts } from "@/lib/api/portal";
 import { adjustStockAction, receiveStockAction } from "./actions";
 import { AdjustForm } from "./adjust-form";
 import { ReceiveForm } from "./receive-form";
-import { toOptions } from "./target-select";
+import { toOptions } from "./stock-options";
 
 export default async function StockPage({
   params,

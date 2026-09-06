@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { EMPTY_FORM_STATE, type FormState } from "@/lib/forms/form-state";
-import { TargetSelect, type StockOption } from "./target-select";
+import { TargetSelect } from "./target-select";
+import type { StockOption } from "./stock-options";
 
 function SubmitButton() {
   const { pending } = useFormStatus();

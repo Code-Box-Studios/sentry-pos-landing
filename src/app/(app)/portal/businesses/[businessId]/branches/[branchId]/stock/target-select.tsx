@@ -1,31 +1,7 @@
 "use client";
 
 import { Field } from "@/components/ui/field";
-import type { Product } from "@/lib/api/types";
-
-export interface StockOption {
-  value: string;
-  label: string;
-}
-
-/**
- * Only tracked products can hold stock, so untracked ones never appear.
- *
- * A product with variants offers only its variants: stock is held per variant, so receiving
- * against the parent of a variant product is not something the data model allows.
- */
-export function toOptions(products: Product[]): StockOption[] {
-  return products
-    .filter((product) => product.trackStock)
-    .flatMap((product) =>
-      product.variants.length === 0
-        ? [{ value: product.id, label: product.name }]
-        : product.variants.map((variant) => ({
-            value: `${product.id}:${variant.id}`,
-            label: `${product.name} — ${variant.name}`,
-          })),
-    );
-}
+import type { StockOption } from "./stock-options";
 
 export function TargetSelect({
   id,

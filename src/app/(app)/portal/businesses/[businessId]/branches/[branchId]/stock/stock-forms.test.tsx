@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AdjustForm } from "./adjust-form";
 import { ReceiveForm } from "./receive-form";
-import { toOptions } from "./target-select";
+import { toOptions } from "./stock-options";
 import type { FormState } from "@/lib/forms/form-state";
 import type { Product } from "@/lib/api/types";
 
