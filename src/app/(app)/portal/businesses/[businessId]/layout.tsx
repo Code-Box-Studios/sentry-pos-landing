@@ -35,6 +35,8 @@ export default async function BusinessLayout({
         { href: `${base}/catalog`, label: "Products" },
         { href: `${base}/categories`, label: "Categories" },
         { href: `${base}/modifiers`, label: "Modifiers" },
+        { href: `${base}/discounts`, label: "Discounts" },
+        { href: `${base}/settings`, label: "Settings" },
         { href: "/portal", label: "← All businesses" },
       ]}
       aside={

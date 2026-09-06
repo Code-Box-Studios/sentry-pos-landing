@@ -6,8 +6,10 @@ import { TBody, TD, TH, THead, TR, Table } from "@/components/ui/table";
 import { listBusinesses } from "@/lib/api/portal";
 import { formatManilaDate } from "@/lib/format";
 
-// Only routes that exist. `/portal/settings` (the refund PIN) joins this list when built.
-const NAV = [{ href: "/portal", label: "Businesses" }];
+const NAV = [
+  { href: "/portal", label: "Businesses" },
+  { href: "/portal/settings", label: "Settings" },
+];
 
 export default async function PortalHomePage() {
   const businesses = await listBusinesses();
