@@ -257,7 +257,7 @@ const BOX = { width: 100, height: 20 };
 
 describe("toPolyline", () => {
   it("spreads points evenly across the width", () => {
-    expect(toPolyline([0, 0, 0], BOX)).toBe("0,20 50,20 100,20");
+    expect(toPolyline([0, 0, 0], BOX)).toBe("0,10 50,10 100,10");
   });
 
   it("puts the maximum at the top and the minimum at the bottom", () => {
