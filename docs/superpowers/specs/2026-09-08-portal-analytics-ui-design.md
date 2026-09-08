@@ -58,10 +58,16 @@ anything needing staff identity.
 
 ## Information architecture
 
-**`/portal` becomes the dashboard (§0)**, replacing today's business list.
-`analytics-spec.md` §0 calls it "the Portal Landing", it spans every business,
-and each business card links through to that business. Nothing is lost — the
-cards *are* the way in, and they carry today's figures as well as the name.
+**`/portal` becomes the dashboard (§0)**, and today's business list moves to
+`/portal/businesses`. `analytics-spec.md` §0 calls the dashboard "the Portal
+Landing"; it spans every business and each card links through to that business,
+carrying today's figures as well as the name.
+
+**The list has to survive the move.** The dashboard excludes demo businesses —
+that is deliberate on the API side (project-spec §8 keeps training data out of
+rollups) — so if the dashboard simply replaced the list, a demo business would
+have no entry point anywhere in the portal. `/portal/businesses` keeps the
+complete list, demo included, and the dashboard links to it.
 
 **Analytics is top-level, not nested under a business:**
 
