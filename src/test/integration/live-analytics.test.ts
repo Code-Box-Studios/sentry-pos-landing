@@ -73,8 +73,15 @@ const ROUTES = [
   "/portal/businesses",
   "/portal/analytics/overview",
   "/portal/analytics/sales",
+  "/portal/analytics/products",
+  "/portal/analytics/profit",
+  "/portal/analytics/leaks",
+  "/portal/analytics/inventory",
+  "/portal/analytics/tax",
   "/portal/analytics/overview?from=2026-03-01&to=2026-03-07",
   "/portal/analytics/sales?from=2026-03-01&to=2026-03-07&granularity=week",
+  "/portal/analytics/products?from=2026-03-01&to=2026-03-07&by=revenue",
+  "/portal/analytics/inventory?from=2026-03-01&to=2026-03-07&page=1",
 ];
 
 live("analytics screens (live)", () => {
@@ -121,6 +128,16 @@ live("analytics screens (live)", () => {
       { headers: { cookie }, redirect: "manual" },
     );
     expect(response.status).toBe(400);
+  });
+
+  // The one error path a user can reach through the UI: the API bounds the
+  // ledger merge, and the page shows the API's own words rather than its own.
+  it("shows the API's message when paged past the merge bound", async () => {
+    const { status, html } = await page(
+      "/portal/analytics/inventory?from=2026-03-01&to=2026-03-07&page=999",
+    );
+    expect(status).toBe(200);
+    expect(html).toContain("narrow the date range");
   });
 
   it("sends an unauthenticated visitor to the login page", async () => {

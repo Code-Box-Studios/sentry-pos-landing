@@ -44,8 +44,12 @@ export function scopeQuery(
   return query.toString();
 }
 
-/** Plan 2 appends its four tabs here. */
 export const ANALYTICS_TABS = [
   { href: "/portal/analytics/overview", label: "Overview" },
   { href: "/portal/analytics/sales", label: "Sales" },
+  { href: "/portal/analytics/products", label: "Products" },
+  { href: "/portal/analytics/profit", label: "Profit" },
+  { href: "/portal/analytics/leaks", label: "Leaks" },
+  { href: "/portal/analytics/inventory", label: "Inventory" },
+  { href: "/portal/analytics/tax", label: "Tax" },
 ];
