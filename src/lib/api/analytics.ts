@@ -5,8 +5,18 @@ import type {
   BreakdownsReport,
   DashboardReport,
   HeatmapDay,
+  LeaksReport,
+  Movement,
+  OnHandReport,
   OverviewReport,
+  Paginated,
   PatternsReport,
+  ProductTrendReport,
+  ProfitReport,
+  ShrinkageReport,
+  SlowProductsReport,
+  TaxReport,
+  TopProductsReport,
   TrendBucket,
 } from "./types";
 
@@ -69,6 +79,96 @@ export function getSalesBreakdowns(
   scope: AnalyticsScope,
 ): Promise<BreakdownsReport> {
   return apiFetch<BreakdownsReport>("/portal/analytics/sales/breakdowns", {
+    query: scopeQuery(scope),
+  });
+}
+
+export function getTopProducts(
+  scope: AnalyticsScope,
+  options: { by?: "units" | "revenue"; limit?: number } = {},
+): Promise<TopProductsReport> {
+  return apiFetch<TopProductsReport>("/portal/analytics/products/top", {
+    query: { ...scopeQuery(scope), by: options.by, limit: options.limit },
+  });
+}
+
+export function getSlowProducts(
+  scope: AnalyticsScope,
+  options: { limit?: number } = {},
+): Promise<SlowProductsReport> {
+  return apiFetch<SlowProductsReport>("/portal/analytics/products/slow", {
+    query: { ...scopeQuery(scope), limit: options.limit },
+  });
+}
+
+export function getProductTrend(
+  productId: string,
+  scope: AnalyticsScope,
+  granularity: "day" | "week" | "month" = "day",
+): Promise<ProductTrendReport> {
+  return apiFetch<ProductTrendReport>(
+    `/portal/analytics/products/${productId}/trend`,
+    { query: { ...scopeQuery(scope), granularity } },
+  );
+}
+
+export function getProfit(
+  scope: AnalyticsScope,
+  granularity: "day" | "week" | "month" = "day",
+): Promise<ProfitReport> {
+  return apiFetch<ProfitReport>("/portal/analytics/profit", {
+    query: { ...scopeQuery(scope), granularity },
+  });
+}
+
+export function getLeaks(scope: AnalyticsScope): Promise<LeaksReport> {
+  return apiFetch<LeaksReport>("/portal/analytics/leaks", {
+    query: scopeQuery(scope),
+  });
+}
+
+/**
+ * The ledger is PAGINATED, and the API refuses `page × pageSize > 2000` with a
+ * 422 asking for a narrower scope — reports merge per business in memory, so the
+ * depth is deliberately bounded.
+ */
+export function getInventoryMovements(
+  scope: AnalyticsScope,
+  options: {
+    type?: string;
+    productId?: string;
+    page?: number;
+    pageSize?: number;
+  } = {},
+): Promise<Paginated<Movement>> {
+  return apiFetch<Paginated<Movement>>(
+    "/portal/analytics/inventory/movements",
+    {
+      query: {
+        ...scopeQuery(scope),
+        type: options.type,
+        productId: options.productId,
+        page: options.page,
+        pageSize: options.pageSize,
+      },
+    },
+  );
+}
+
+export function getShrinkage(scope: AnalyticsScope): Promise<ShrinkageReport> {
+  return apiFetch<ShrinkageReport>("/portal/analytics/inventory/shrinkage", {
+    query: scopeQuery(scope),
+  });
+}
+
+export function getOnHand(scope: AnalyticsScope): Promise<OnHandReport> {
+  return apiFetch<OnHandReport>("/portal/analytics/inventory/on-hand", {
+    query: scopeQuery(scope),
+  });
+}
+
+export function getTax(scope: AnalyticsScope): Promise<TaxReport> {
+  return apiFetch<TaxReport>("/portal/analytics/tax", {
     query: scopeQuery(scope),
   });
 }

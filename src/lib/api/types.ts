@@ -315,3 +315,230 @@ export interface BreakdownsReport {
     transactions: number;
   }[];
 }
+
+// ---------------------------------------------------------------------------
+// Analytics §3 — products sold
+//
+// Rows are keyed by (productId, variantId): a variant is what actually sells.
+// MISC (open-price) lines are excluded by the API, so product revenue does NOT
+// sum to net sales — that is deliberate, not a bug to chase.
+// ---------------------------------------------------------------------------
+
+export interface SoldRow {
+  productId: string;
+  variantId: string | null;
+  name: string;
+  /** A plain quantity, not centavos. */
+  units: number;
+  revenueC: number;
+  grossProfitC: number | null;
+  marginPct: number | null;
+}
+
+export interface CategorySales {
+  categoryId: string;
+  name: string;
+  units: number;
+  revenueC: number;
+}
+
+export interface TopProductsReport {
+  from: string;
+  to: string;
+  by: "units" | "revenue";
+  rows: SoldRow[];
+  categories: CategorySales[];
+}
+
+export interface SlowProductsReport {
+  from: string;
+  to: string;
+  bottom: SoldRow[];
+  zeroSales: { productId: string; name: string; categoryName: string }[];
+}
+
+export interface ProductTrendBucket {
+  bucket: string;
+  units: number;
+  revenueC: number;
+  grossProfitC: number | null;
+  marginPct: number | null;
+}
+
+export interface ProductTrendReport {
+  productId: string;
+  from: string;
+  to: string;
+  granularity: "day" | "week" | "month";
+  buckets: ProductTrendBucket[];
+}
+
+// ---------------------------------------------------------------------------
+// Analytics §4 — profit and leaks
+// ---------------------------------------------------------------------------
+
+export interface MarginFigures {
+  revenueC: number;
+  /** UNKNOWN, not zero, when nothing in the group carried a cost. */
+  costC: number | null;
+  grossProfitC: number | null;
+  marginPct: number | null;
+}
+
+export interface ProductMarginRow extends MarginFigures {
+  productId: string;
+  variantId: string | null;
+  name: string;
+}
+
+export interface CategoryMarginRow extends MarginFigures {
+  categoryId: string;
+  name: string;
+}
+
+export interface ProfitBucket {
+  bucket: string;
+  grossProfitC: number | null;
+  marginPct: number | null;
+}
+
+export interface ProfitReport {
+  from: string;
+  to: string;
+  granularity: "day" | "week" | "month";
+  overTime: ProfitBucket[];
+  byProduct: ProductMarginRow[];
+  byCategory: CategoryMarginRow[];
+  costedRevenueC: number;
+  uncostedRevenueC: number;
+}
+
+export interface NamedDiscount {
+  discountId: string;
+  name: string;
+  kind: string;
+  timesUsed: number;
+  amountC: number;
+}
+
+export interface StatusBucket {
+  count: number;
+  valueC: number;
+  reasons: { reason: string; count: number; valueC: number }[];
+}
+
+export interface OverShortEntry {
+  shiftId: string;
+  branchId: string;
+  branchName: string;
+  closedAt: string;
+  expectedCashC: number | null;
+  closingCashC: number | null;
+  /** `closing − expected`, so negative is short. Null if either is unrecorded. */
+  varianceC: number | null;
+}
+
+export interface LeaksReport {
+  from: string;
+  to: string;
+  discountsByName: NamedDiscount[];
+  /** The remainder of `sales.discount` that no line accounts for. */
+  orderLevelDiscountC: number;
+  scPwd: { discountC: number; vatExemptSalesC: number; saleCount: number };
+  /** `pctOfNetSales` is a FRACTION, and null when there were no net sales. */
+  miscLines: { revenueC: number; pctOfNetSales: number | null };
+  voids: StatusBucket;
+  refunds: StatusBucket;
+  overShort: OverShortEntry[];
+}
+
+// ---------------------------------------------------------------------------
+// Analytics §5 — inventory
+// ---------------------------------------------------------------------------
+
+export interface Movement {
+  id: string;
+  createdAt: string;
+  branchId: string;
+  branchName: string;
+  productId: string;
+  variantId: string | null;
+  productName: string;
+  variantName: string | null;
+  type: string;
+  /** Signed: negative is stock leaving. A plain quantity, not centavos. */
+  qtyDelta: number;
+  reasonCategory: string | null;
+  unitCostC: number | null;
+  note: string | null;
+  /** From the audit trail; null when no audit row matches the movement. */
+  actor: { actorType: string; actorId: string | null; action: string } | null;
+}
+
+export interface ShrinkageEntry {
+  reasonCategory: string;
+  units: number;
+  /** Null when nothing in this reason bucket had a cost. */
+  valueC: number | null;
+  uncostedUnits: number;
+}
+
+export interface ShrinkageReport {
+  from: string;
+  to: string;
+  rows: ShrinkageEntry[];
+}
+
+export interface OnHandEntry {
+  branchId: string;
+  branchName: string;
+  productId: string;
+  variantId: string | null;
+  name: string;
+  qty: number;
+  unitCostC: number | null;
+  valueC: number | null;
+  lowStockThreshold: number | null;
+  isLow: boolean;
+  /** Null when the product did not sell in the range — an unbounded runway. */
+  daysOfStock: number | null;
+}
+
+export interface OnHandReport {
+  from: string;
+  to: string;
+  rows: OnHandEntry[];
+  totals: { valueC: number; uncostedItems: number };
+}
+
+// ---------------------------------------------------------------------------
+// Analytics §6 — tax
+// ---------------------------------------------------------------------------
+
+export interface TaxBusinessRow {
+  businessId: string;
+  name: string;
+  /** A FRACTION (0.12 = 12%). */
+  taxRate: number;
+  vatableSalesC: number;
+  vatC: number;
+  vatExemptSalesC: number;
+  scPwdDiscountC: number;
+  serviceChargeC: number;
+}
+
+export interface TaxTotals {
+  vatableSalesC: number;
+  vatC: number;
+  vatExemptSalesC: number;
+  scPwdDiscountC: number;
+  serviceChargeC: number;
+}
+
+export interface TaxReport {
+  from: string;
+  to: string;
+  businesses: TaxBusinessRow[];
+  /** Amounts only — deliberately no blended tax rate. */
+  totals: TaxTotals;
+}

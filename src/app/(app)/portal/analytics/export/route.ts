@@ -23,6 +23,13 @@ const REPORTS: Record<string, string> = {
   "sales-patterns": "/portal/analytics/sales/patterns",
   "sales-breakdowns": "/portal/analytics/sales/breakdowns",
   tax: "/portal/analytics/tax",
+  "products-top": "/portal/analytics/products/top",
+  "products-slow": "/portal/analytics/products/slow",
+  profit: "/portal/analytics/profit",
+  leaks: "/portal/analytics/leaks",
+  "inventory-movements": "/portal/analytics/inventory/movements",
+  "inventory-shrinkage": "/portal/analytics/inventory/shrinkage",
+  "inventory-on-hand": "/portal/analytics/inventory/on-hand",
 };
 
 /** Only these reach the API; anything else in the query is dropped. */
