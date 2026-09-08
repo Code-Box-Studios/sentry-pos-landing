@@ -5,6 +5,7 @@ import { Badge } from "./badge";
 import { Button } from "./button";
 import { Field } from "./field";
 import { Input } from "./input";
+import { Select } from "./select";
 
 describe("Button", () => {
   it("is a submit button when asked, so a form posts on Enter", () => {
@@ -73,5 +74,22 @@ describe("Badge", () => {
   it("renders its label", () => {
     render(<Badge tone="danger">suspended</Badge>);
     expect(screen.getByText("suspended")).toBeInTheDocument();
+  });
+});
+
+describe("Select", () => {
+  it("renders its options and reports the chosen value", () => {
+    render(
+      <Select aria-label="Business" defaultValue="b-2">
+        <option value="b-1">One</option>
+        <option value="b-2">Two</option>
+      </Select>,
+    );
+    expect(screen.getByLabelText("Business")).toHaveValue("b-2");
+  });
+
+  it("marks itself invalid for the same styling the inputs use", () => {
+    render(<Select aria-label="Business" aria-invalid="true" />);
+    expect(screen.getByLabelText("Business")).toHaveAttribute("aria-invalid", "true");
   });
 });
