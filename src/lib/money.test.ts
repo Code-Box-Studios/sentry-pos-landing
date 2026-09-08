@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { centavosToPesos, formatPesos, parseQuantity, pesosToCentavos } from "./money";
+import {
+  centavosToPesos,
+  formatPercentOr,
+  formatPesos,
+  formatPesosOr,
+  formatPointsOr,
+  parseQuantity,
+  pesosToCentavos,
+} from "./money";
 
 describe("pesosToCentavos", () => {
   it("converts a plain amount", () => {
@@ -85,5 +93,64 @@ describe("parseQuantity", () => {
 
   it("accepts zero, which is a valid corrected stock count", () => {
     expect(parseQuantity("0")).toBe(0);
+  });
+});
+
+describe("formatPesosOr", () => {
+  it("formats a number the way formatPesos does", () => {
+    expect(formatPesosOr(125000)).toBe(formatPesos(125000));
+  });
+
+  // An unknown cost and a zero cost mean opposite things to an owner deciding
+  // what to stock. This is the whole reason the function exists.
+  it("renders null as an em dash, never as zero pesos", () => {
+    expect(formatPesosOr(null)).toBe("—");
+    expect(formatPesosOr(null)).not.toBe(formatPesos(0));
+  });
+
+  it("still formats a real zero", () => {
+    expect(formatPesosOr(0)).toBe(formatPesos(0));
+  });
+
+  it("takes a custom fallback", () => {
+    expect(formatPesosOr(null, "unknown")).toBe("unknown");
+  });
+});
+
+describe("formatPercentOr", () => {
+  // The API sends fractions. Rendering 0.4 as "0.4%" instead of "40.0%" would
+  // be wrong by two orders of magnitude and look plausible on screen.
+  it("multiplies the fraction by 100", () => {
+    expect(formatPercentOr(0.4)).toBe("40.0%");
+    expect(formatPercentOr(0.125)).toBe("12.5%");
+  });
+
+  it("keeps the sign on a fall", () => {
+    expect(formatPercentOr(-0.25)).toBe("-25.0%");
+  });
+
+  it("renders null as an em dash, never as 0%", () => {
+    expect(formatPercentOr(null)).toBe("—");
+  });
+
+  it("still formats a real zero", () => {
+    expect(formatPercentOr(0)).toBe("0.0%");
+  });
+});
+
+describe("formatPointsOr", () => {
+  // Margin comparisons are already ratios, so the API sends POINTS, not a
+  // percentage change. 0.05 here means "five points better".
+  it("renders points with a sign", () => {
+    expect(formatPointsOr(0.05)).toBe("+5.0 pts");
+    expect(formatPointsOr(-0.02)).toBe("-2.0 pts");
+  });
+
+  it("renders null as an em dash", () => {
+    expect(formatPointsOr(null)).toBe("—");
+  });
+
+  it("renders no change without a sign", () => {
+    expect(formatPointsOr(0)).toBe("0.0 pts");
   });
 });

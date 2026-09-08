@@ -72,3 +72,49 @@ export function parseQuantity(input: string): number | null {
   const value = Number(cleaned);
   return Number.isFinite(value) && value >= 0 ? value : null;
 }
+
+/** The one string the portal shows for a figure the API says is unknown. */
+export const UNKNOWN = "—";
+
+/**
+ * Money, or `—` when the API says the figure is unknown.
+ *
+ * Every analytics money field is nullable, and a null is NOT a zero: an
+ * uncosted product has an unknown margin, not a 100% one. Rendering it as
+ * `₱0.00` would be a plausible-looking lie, so nulls stop here.
+ */
+export function formatPesosOr(
+  centavosC: number | null,
+  fallback: string = UNKNOWN,
+): string {
+  return centavosC === null ? fallback : formatPesos(centavosC);
+}
+
+/**
+ * A ratio from the API rendered as a percentage.
+ *
+ * The API sends FRACTIONS (0.4 = 40%). This is the only place that conversion
+ * happens — no component multiplies a ratio itself.
+ */
+export function formatPercentOr(
+  fraction: number | null,
+  fallback: string = UNKNOWN,
+): string {
+  return fraction === null ? fallback : `${(fraction * 100).toFixed(1)}%`;
+}
+
+/**
+ * A margin comparison, in percentage POINTS.
+ *
+ * `marginPct` is already a ratio, so the API compares periods with
+ * `changePoints` rather than a percentage change — "five points better", not
+ * "12% better". The sign is explicit because the direction is the message.
+ */
+export function formatPointsOr(
+  points: number | null,
+  fallback: string = UNKNOWN,
+): string {
+  if (points === null) return fallback;
+  const value = (points * 100).toFixed(1);
+  return `${points > 0 ? "+" : ""}${value} pts`;
+}
