@@ -188,3 +188,130 @@ export interface Terminal {
   /** False once remotely unpaired — the device 401s on its next request. */
   paired: boolean;
 }
+
+// ---------------------------------------------------------------------------
+// Analytics (analytics-spec §0–§6)
+//
+// Money is integer centavos and `null` means UNKNOWN, never zero. Ratios are
+// FRACTIONS (0.4 = 40%). `Date` fields on the API become ISO strings over JSON,
+// so they are typed as `string` here — typing them as `Date` compiles and then
+// throws on the first date method.
+// ---------------------------------------------------------------------------
+
+export interface Kpi {
+  value: number;
+  previous: number;
+  /** A fraction of the previous period (0.5 = up by half). Null from a zero base. */
+  changePct: number | null;
+}
+
+export interface NullableKpi {
+  value: number | null;
+  previous: number | null;
+  changePct: number | null;
+}
+
+export interface MarginKpi {
+  value: number | null;
+  previous: number | null;
+  /** Percentage POINTS, not a percentage change — a margin is already a ratio. */
+  changePoints: number | null;
+}
+
+/** The scope every report but the dashboard takes. */
+export interface AnalyticsScope {
+  businessId?: string;
+  /** Only meaningful with a businessId; the API rejects it alone. */
+  branchId?: string;
+  from: string;
+  to: string;
+}
+
+export interface DayFigures {
+  salesC: number;
+  grossProfitC: number | null;
+  transactions: number;
+}
+
+export interface DashboardBusiness {
+  businessId: string;
+  name: string;
+  today: DayFigures;
+  sameDayLastWeek: DayFigures;
+  branches: (DayFigures & { branchId: string; name: string })[];
+  sparkline: { date: string; salesC: number }[];
+}
+
+export interface DashboardReport {
+  businesses: DashboardBusiness[];
+  live: {
+    openShifts: {
+      shiftId: string;
+      businessId: string;
+      branchId: string;
+      branchName: string;
+      terminalName: string;
+      openedAt: string;
+    }[];
+    terminals: {
+      terminalId: string;
+      businessId: string;
+      branchId: string;
+      name: string;
+      code: string;
+      lastSeenAt: string | null;
+      paired: boolean;
+    }[];
+    unreadNotifications: number;
+  };
+  attention: {
+    lowStock: { businessId: string; count: number }[];
+    unclosedShifts: { businessId: string; count: number }[];
+  };
+}
+
+export interface OverviewReport {
+  from: string;
+  to: string;
+  grossSalesC: Kpi;
+  discountsC: Kpi;
+  netSalesC: Kpi;
+  serviceChargeC: Kpi;
+  transactions: Kpi;
+  voidCount: Kpi;
+  refundCount: Kpi;
+  averageBasketC: NullableKpi;
+  grossProfitC: NullableKpi;
+  marginPct: MarginKpi;
+  costedRevenueC: number;
+  uncostedRevenueC: number;
+}
+
+export interface HeatmapDay {
+  date: string;
+  salesC: number;
+  transactions: number;
+}
+
+export interface TrendBucket {
+  bucket: string;
+  salesC: number;
+  grossProfitC: number | null;
+  transactions: number;
+}
+
+export interface PatternsReport {
+  hourOfDay: { hour: number; salesC: number; transactions: number }[];
+  dayOfWeek: { dayOfWeek: number; salesC: number; transactions: number }[];
+}
+
+export interface BreakdownsReport {
+  byPaymentMethod: { method: string; salesC: number; transactions: number }[];
+  byOrderType: { orderType: string; salesC: number; transactions: number }[];
+  byBranch: {
+    branchId: string;
+    name: string;
+    salesC: number;
+    transactions: number;
+  }[];
+}
