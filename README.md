@@ -1,5 +1,9 @@
 # sentry-pos-landing
 
+## Online release update — 2026-09-15
+
+Use Node22 (see `.nvmrc`). The owner portal now includes real-business onboarding, reports, transfers/counts/expiry, alert settings, image uploads, demo reset and account export/closure; platform admin includes metrics and data browsing. CI runs tests, lint, builds and production dependency audits. Consult `../DEPLOYMENT.md` for configuration and `../DEPLOYMENT_READINESS.md` for actual validation and external release requirements. Older milestone notes below are historical; offline sync and staff remain later work.
+
 The public web surfaces for **Sentry**, a point-of-sale system for Philippine small businesses.
 Three things live here:
 

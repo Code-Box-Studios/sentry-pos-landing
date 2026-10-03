@@ -1,3 +1,5 @@
+import { getMedia } from "@/lib/api/media";
+import { MediaForm } from "../../../../media/media-form";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Alert } from "@/components/ui/alert";
@@ -31,6 +33,8 @@ export default async function EditProductPage({
     listModifierGroups(businessId),
   ]);
 
+  if (product.businessId !== businessId) notFound();
+  const asset = await getMedia("product", productId);
   const base = `/portal/businesses/${businessId}`;
 
   return (
@@ -53,6 +57,7 @@ export default async function EditProductPage({
         product={product}
       />
 
+      <MediaForm kind="product" id={productId} asset={asset} />
       <Card>
         <CardHeader>
           <CardTitle>Modifiers</CardTitle>
@@ -64,8 +69,8 @@ export default async function EditProductPage({
               loss. Remove this when GET /portal/products/:id starts returning them. */}
           <Alert tone="warn">
             The API does not yet report which groups a product already has, so this list starts
-            empty each time. Saving replaces every link on this product — tick every group it
-            should have, not just the new one.
+            empty each time. Saving replaces every link on this product — tick every group it should
+            have, not just the new one.
           </Alert>
           <ModifierLinks
             action={setProductGroupsAction}

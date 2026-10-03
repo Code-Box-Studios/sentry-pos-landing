@@ -17,7 +17,9 @@ const CATEGORY: Category = {
 
 describe("CategoryForm", () => {
   it("creates with the business id attached", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<CategoryForm action={action} businessId="b-1" />);
 
     await userEvent.type(screen.getByLabelText("Name"), "Pastries");
@@ -29,7 +31,9 @@ describe("CategoryForm", () => {
   });
 
   it("edits an existing category, carrying its id", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<CategoryForm action={action} businessId="b-1" category={CATEGORY} />);
 
     expect(screen.getByLabelText("Name")).toHaveValue("Drinks");
@@ -45,11 +49,9 @@ describe("CategoryForm", () => {
   });
 
   it("shows a validation message against the name", async () => {
-    const action = vi.fn(
-      async (): Promise<FormState> => ({
-        fieldErrors: { name: "name should not be empty" },
-      }),
-    );
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(async () => ({
+      fieldErrors: { name: "name should not be empty" },
+    }));
     render(<CategoryForm action={action} businessId="b-1" />);
 
     await userEvent.click(screen.getByRole("button", { name: "Add category" }));

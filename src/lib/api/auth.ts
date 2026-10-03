@@ -19,6 +19,15 @@ export function login(email: string, password: string): Promise<LoginResult> {
   });
 }
 
+export interface ManagerSetupInput { email: string; temporaryPin: string; password: string; permanentPin: string }
+type ManagerSetupResult = { accessToken: string; refreshToken: string; role: "manager" };
+export function setupManager(input: ManagerSetupInput): Promise<ManagerSetupResult> {
+  return apiFetch("/auth/staff/setup-manager", { method: "POST", body: input, authenticated: false });
+}
+export function setupStaffPassword(input: Omit<ManagerSetupInput, "permanentPin">): Promise<ManagerSetupResult> {
+  return apiFetch("/auth/staff/setup-password", { method: "POST", body: input, authenticated: false });
+}
+
 export function logout(refreshToken: string): Promise<{ ok: true }> {
   return apiFetch<{ ok: true }>("/auth/logout", {
     method: "POST",

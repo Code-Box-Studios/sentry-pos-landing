@@ -4,9 +4,17 @@ import type { ActorType, AuditEntry } from "@/lib/api/types";
 
 const ACTOR_LABELS: Record<ActorType, string> = {
   owner: "Owner",
+  staff: "Staff",
   terminal: "Terminal",
   platform_admin: "Platform admin",
 };
+function actorLabel(entry: AuditEntry): string {
+  const metadata = entry.metadata && typeof entry.metadata === "object" ? entry.metadata as Record<string, unknown> : {};
+  const role = metadata.operatorRole ?? metadata.actorRole;
+  if (role === "cashier") return "Cashier";
+  if (role === "manager") return "Manager";
+  return ACTOR_LABELS[entry.actorType] ?? "Unattributed legacy entry";
+}
 
 export function ActivityTable({ entries }: { entries: AuditEntry[] }) {
   if (entries.length === 0) {
@@ -29,7 +37,7 @@ export function ActivityTable({ entries }: { entries: AuditEntry[] }) {
             <TD className="whitespace-nowrap text-steel">
               {formatManilaDateTime(entry.createdAt)}
             </TD>
-            <TD className="text-steel">{ACTOR_LABELS[entry.actorType]}</TD>
+            <TD className="text-steel">{actorLabel(entry)}</TD>
             <TD className="font-mono text-xs text-charcoal">{entry.action}</TD>
             <TD className="text-steel">{entry.entityType}</TD>
           </TR>

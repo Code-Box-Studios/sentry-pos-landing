@@ -1,3 +1,4 @@
+import { loadScope, loadAnalyticsChoices } from "../load-scope";
 import { ScopeSelector } from "@/components/app/scope-selector";
 import { BarRow } from "@/components/charts/bar-row";
 import { CalendarHeatmap } from "@/components/charts/calendar-heatmap";
@@ -11,13 +12,9 @@ import {
   getSalesTrend,
 } from "@/lib/api/analytics";
 import { ValidationError } from "@/lib/api/errors";
-import { listBranches, listBusinesses } from "@/lib/api/portal";
-import { readScope, scopeQuery } from "../scope";
+import { scopeQuery } from "../scope";
 
-const HOUR_LABELS = Array.from(
-  { length: 24 },
-  (_, hour) => `${String(hour).padStart(2, "0")}:00`,
-);
+const HOUR_LABELS = Array.from({ length: 24 }, (_, hour) => `${String(hour).padStart(2, "0")}:00`);
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default async function SalesPage({
@@ -32,13 +29,11 @@ export default async function SalesPage({
   }>;
 }) {
   const params = await searchParams;
-  const scope = readScope(params);
-  const granularity = params.granularity ?? "day";
+  const scope = await loadScope(params);
+  const granularity =
+    params.granularity === "week" || params.granularity === "month" ? params.granularity : "day";
 
-  const [businesses, branches] = await Promise.all([
-    listBusinesses(),
-    scope.businessId ? listBranches(scope.businessId) : Promise.resolve([]),
-  ]);
+  const { businesses, branches, role } = await loadAnalyticsChoices(scope.businessId);
 
   let heatmap;
   let trend;
@@ -55,11 +50,7 @@ export default async function SalesPage({
     if (error instanceof ValidationError) {
       return (
         <div className="space-y-6">
-          <ScopeSelector
-            businesses={businesses}
-            branches={branches}
-            scope={scope}
-          />
+          <ScopeSelector businesses={businesses} branches={branches} scope={scope} role={role} />
           <Alert>{error.message}</Alert>
         </div>
       );
@@ -69,11 +60,7 @@ export default async function SalesPage({
 
   return (
     <div className="space-y-6">
-      <ScopeSelector
-        businesses={businesses}
-        branches={branches}
-        scope={scope}
-      />
+      <ScopeSelector businesses={businesses} branches={branches} scope={scope} role={role} />
 
       <Card>
         <CardHeader>
@@ -82,6 +69,9 @@ export default async function SalesPage({
         <CardBody>
           <CalendarHeatmap
             title="Sales per business day"
+            dayHref={(date) =>
+              `/portal/analytics/sales?${scopeQuery({ ...scope, from: date, to: date })}#breakdowns`
+            }
             days={heatmap.map((day) => ({ date: day.date, value: day.salesC }))}
           />
         </CardBody>
@@ -90,6 +80,17 @@ export default async function SalesPage({
       <Card>
         <CardHeader>
           <CardTitle>Trend</CardTitle>
+          <nav aria-label="Trend interval" className="flex gap-4 text-sm">
+            {(["day", "week", "month"] as const).map((value) => (
+              <a
+                key={value}
+                href={`?${scopeQuery(scope, { granularity: value })}`}
+                aria-current={granularity === value ? "true" : undefined}
+              >
+                {value[0].toUpperCase() + value.slice(1)}
+              </a>
+            ))}
+          </nav>
         </CardHeader>
         <CardBody>
           <TrendLine
@@ -99,10 +100,21 @@ export default async function SalesPage({
               value: bucket.salesC,
             }))}
           />
+          {role === "owner" && trend.some((bucket) => bucket.grossProfitC === null) && (
+            <p className="text-sm text-steel">
+              Profit is unknown for periods without recorded costs; those periods are omitted.
+            </p>
+          )}
+          {role === "owner" && <TrendLine
+            title="Gross profit over time"
+            points={trend
+              .filter((bucket) => bucket.grossProfitC !== null)
+              .map((bucket) => ({ label: bucket.bucket, value: bucket.grossProfitC! }))}
+          />}
         </CardBody>
       </Card>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div id="breakdowns" className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Hour of day</CardTitle>
@@ -181,6 +193,17 @@ export default async function SalesPage({
         </Card>
       </div>
 
+      <div className="flex flex-wrap gap-4">
+        {["sales-trend", "sales-patterns", "sales-breakdowns"].map((report) => (
+          <a
+            key={report}
+            className="text-sm text-brand-green-dark hover:underline"
+            href={`/portal/analytics/export?${scopeQuery(scope, { report, granularity })}`}
+          >
+            Download {report.replace("sales-", "")} CSV
+          </a>
+        ))}
+      </div>
       <a
         href={`/portal/analytics/export?${scopeQuery(scope, {
           report: "sales-heatmap",

@@ -9,6 +9,7 @@ const push = vi.fn();
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push }),
   usePathname: () => "/portal/analytics/overview",
+  useSearchParams: () => new URLSearchParams("granularity=week&by=revenue&page=8"),
 }));
 
 const businesses = [
@@ -25,9 +26,7 @@ const SCOPE = { from: "2026-03-01", to: "2026-03-07" };
 
 function setup(scope = SCOPE) {
   push.mockClear();
-  render(
-    <ScopeSelector businesses={businesses} branches={branches} scope={scope} />,
-  );
+  render(<ScopeSelector businesses={businesses} branches={branches} scope={scope} />);
 }
 
 describe("ScopeSelector", () => {
@@ -75,9 +74,9 @@ describe("ScopeSelector", () => {
         scope={{ ...SCOPE, businessId: "b-1" }}
       />,
     );
-    const options = Array.from(
-      screen.getByLabelText("Branch").querySelectorAll("option"),
-    ).map((o) => o.textContent);
+    const options = Array.from(screen.getByLabelText("Branch").querySelectorAll("option")).map(
+      (o) => o.textContent,
+    );
     expect(options).toEqual(["All branches", "Main", "Annex"]);
   });
 
@@ -118,4 +117,29 @@ describe("ScopeSelector", () => {
     expect(url).toContain("businessId=b-1");
     expect(url).toContain("branchId=br-1");
   });
+});
+
+it("Today selects the previous date before the chosen business cutoff", () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-09-14T18:00:00Z"));
+  push.mockClear();
+  render(
+    <ScopeSelector
+      businesses={[{ id: "b-1", name: "Kape", dayStartTime: "06:00" } as Business]}
+      branches={[]}
+      scope={{ ...SCOPE, businessId: "b-1" }}
+    />,
+  );
+  fireEvent.change(screen.getByLabelText("Range"), { target: { value: "today" } });
+  expect(push).toHaveBeenCalledWith(expect.stringContaining("from=2026-09-14&to=2026-09-14"));
+  vi.useRealTimers();
+});
+
+it("keeps report settings but resets pagination when dates change", () => {
+  setup();
+  fireEvent.change(screen.getByLabelText("To"), { target: { value: "2026-03-31" } });
+  const url = new URL(push.mock.calls[0][0], "http://portal.test");
+  expect(url.searchParams.get("granularity")).toBe("week");
+  expect(url.searchParams.get("by")).toBe("revenue");
+  expect(url.searchParams.has("page")).toBe(false);
 });

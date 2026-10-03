@@ -1,3 +1,5 @@
+import { loadScope } from "../../load-scope";
+import { readPortalRole } from "@/lib/auth/portal-role";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TrendLine } from "@/components/charts/trend-line";
@@ -6,7 +8,7 @@ import { TBody, TD, TH, THead, TR, Table } from "@/components/ui/table";
 import { getProductTrend } from "@/lib/api/analytics";
 import { NotFoundError } from "@/lib/api/errors";
 import { formatPercentOr, formatPesosOr } from "@/lib/money";
-import { readScope, scopeQuery } from "../../scope";
+import { scopeQuery } from "../../scope";
 
 /**
  * One product over time. Variants are MERGED here, deliberately: the top-sellers
@@ -28,7 +30,8 @@ export default async function ProductTrendPage({
 }) {
   const { productId } = await params;
   const query = await searchParams;
-  const scope = readScope(query);
+  const scope = await loadScope(query);
+  const owner = await readPortalRole() !== "manager";
   const granularity = query.granularity ?? "day";
 
   let report;
@@ -74,8 +77,8 @@ export default async function ProductTrendPage({
                 <TH>Period</TH>
                 <TH className="text-right">Units</TH>
                 <TH className="text-right">Revenue</TH>
-                <TH className="text-right">Gross profit</TH>
-                <TH className="text-right">Margin</TH>
+                {owner && <TH className="text-right">Gross profit</TH>}
+                {owner && <TH className="text-right">Margin</TH>}
               </TR>
             </THead>
             <TBody>
@@ -83,15 +86,9 @@ export default async function ProductTrendPage({
                 <TR key={bucket.bucket}>
                   <TD className="text-charcoal">{bucket.bucket}</TD>
                   <TD className="text-right tabular-nums">{bucket.units}</TD>
-                  <TD className="text-right tabular-nums">
-                    {formatPesosOr(bucket.revenueC)}
-                  </TD>
-                  <TD className="text-right tabular-nums">
-                    {formatPesosOr(bucket.grossProfitC)}
-                  </TD>
-                  <TD className="text-right tabular-nums">
-                    {formatPercentOr(bucket.marginPct)}
-                  </TD>
+                  <TD className="text-right tabular-nums">{formatPesosOr(bucket.revenueC)}</TD>
+                  {owner && <TD className="text-right tabular-nums">{formatPesosOr(bucket.grossProfitC)}</TD>}
+                  {owner && <TD className="text-right tabular-nums">{formatPercentOr(bucket.marginPct)}</TD>}
                 </TR>
               ))}
             </TBody>

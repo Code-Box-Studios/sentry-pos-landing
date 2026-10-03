@@ -40,12 +40,18 @@ export default async function AdminBusinessPage({
         <h1 className="mt-2 text-xl font-semibold text-ink">Business</h1>
       </div>
 
-      {/* Stated plainly, because there is deliberately nothing on this page to click. */}
+      {/* Tenant inspection remains read-only. */}
       <Alert tone="info">
-        Platform admins can read tenant data but never change it. Anything that needs editing
-        must be done by the business owner in their own portal.
+        Platform admins can read tenant data but never change it. Anything that needs editing must
+        be done by the business owner in their own portal.
       </Alert>
 
+      <Link
+        className="inline-block text-brand-green-dark hover:underline"
+        href={`/admin/businesses/${id}/inspect`}
+      >
+        Browse catalog, sales, payments and operations →
+      </Link>
       <Card>
         <CardHeader>
           <CardTitle>Branches</CardTitle>

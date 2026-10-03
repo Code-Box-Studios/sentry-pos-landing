@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
+import { Suspense } from "react";
+import { AnalyticsTabs } from "./analytics-tabs";
 import { AppShell } from "@/components/app/app-shell";
-import { PORTAL_NAV } from "../businesses/page";
-import { ANALYTICS_TABS } from "./scope";
+import { portalNav } from "@/components/app/portal-nav";
+import { readPortalRole } from "@/lib/auth/portal-role";
 
 /**
  * The frame every analytics tab renders inside.
@@ -12,23 +13,16 @@ import { ANALYTICS_TABS } from "./scope";
  * would keep showing a stale selection after every change. Each page renders its
  * own.
  */
-export default function AnalyticsLayout({ children }: { children: ReactNode }) {
+export default async function AnalyticsLayout({ children }: { children: ReactNode }) {
+  const role = (await readPortalRole()) ?? "owner";
   return (
-    <AppShell title="Sentry" nav={PORTAL_NAV}>
+    <AppShell title="Sentry" nav={portalNav(role)}>
       <div className="space-y-6">
         <div>
           <h1 className="text-xl font-semibold text-ink">Analytics</h1>
-          <nav className="mt-3 flex gap-4 border-b border-hairline">
-            {ANALYTICS_TABS.map((tab) => (
-              <Link
-                key={tab.href}
-                href={tab.href}
-                className="-mb-px border-b-2 border-transparent px-1 pb-2 text-sm text-steel hover:border-hairline hover:text-charcoal"
-              >
-                {tab.label}
-              </Link>
-            ))}
-          </nav>
+          <Suspense>
+            <AnalyticsTabs role={role} />
+          </Suspense>
         </div>
         {children}
       </div>

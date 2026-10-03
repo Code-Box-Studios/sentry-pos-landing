@@ -5,16 +5,16 @@ import type { CollectionConfig } from "payload";
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
- * Landing images are public content. While the storage host is undecided these live on local disk;
- * pointing Payload's S3 adapter at a public bucket later is a config swap, not a schema change
- * (landing-spec §5). The private tenant bucket is a separate concern the API owns.
+ * Public marketing images use S3 in production and local disk in development.
+ * Payload serves reads; bucket credentials stay server-side. Tenant images use the API instead.
  */
 export const Media: CollectionConfig = {
   slug: "media",
   admin: { group: "Content" },
+  access: { read: () => true },
   upload: {
     staticDir: path.resolve(dirname, "../../../public/media"),
-    mimeTypes: ["image/*"],
+    mimeTypes: ["image/jpeg", "image/png", "image/webp"],
     imageSizes: [
       { name: "wide", width: 1600, height: undefined, position: "centre" },
       { name: "card", width: 800, height: undefined, position: "centre" },

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ProductForm } from "./product-form";
 import type { FormState } from "@/lib/forms/form-state";
@@ -52,7 +52,9 @@ const noop = async (): Promise<FormState> => ({});
 
 describe("ProductForm", () => {
   it("posts a new product with its business id", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<ProductForm action={action} businessId="b-1" categories={CATEGORIES} />);
 
     await userEvent.type(screen.getByLabelText("Name"), "Espresso");
@@ -75,7 +77,9 @@ describe("ProductForm", () => {
   });
 
   it("carries the product id when editing", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(
       <ProductForm action={action} businessId="b-1" categories={CATEGORIES} product={PRODUCT} />,
     );
@@ -85,7 +89,9 @@ describe("ProductForm", () => {
   });
 
   it("posts each existing variant with its id, so it updates rather than duplicating", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(
       <ProductForm action={action} businessId="b-1" categories={CATEGORIES} product={PRODUCT} />,
     );
@@ -99,7 +105,9 @@ describe("ProductForm", () => {
   });
 
   it("posts a new variant with an empty id", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<ProductForm action={action} businessId="b-1" categories={CATEGORIES} />);
 
     await userEvent.type(screen.getByLabelText("Name"), "Tea");
@@ -116,7 +124,9 @@ describe("ProductForm", () => {
   });
 
   it("stops posting a variant once it is removed, which is how the API deletes it", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(
       <ProductForm action={action} businessId="b-1" categories={CATEGORIES} product={PRODUCT} />,
     );
@@ -128,7 +138,9 @@ describe("ProductForm", () => {
   });
 
   it("defaults a new product to active and untracked", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<ProductForm action={action} businessId="b-1" categories={CATEGORIES} />);
 
     await userEvent.type(screen.getByLabelText("Name"), "Bread");
@@ -141,12 +153,14 @@ describe("ProductForm", () => {
   });
 
   it("puts a duplicate-SKU conflict where it can be corrected", async () => {
-    const action = vi.fn(
-      async (): Promise<FormState> => ({ fieldErrors: { sku: "sku already exists" } }),
-    );
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(async () => ({
+      fieldErrors: { sku: "sku already exists" },
+    }));
     render(<ProductForm action={action} businessId="b-1" categories={CATEGORIES} />);
 
     await userEvent.click(screen.getByRole("button", { name: "Create product" }));
-    expect(await screen.findByLabelText("SKU")).toHaveAccessibleDescription("sku already exists");
+    await waitFor(() => {
+      expect(screen.getByLabelText("SKU")).toHaveAccessibleDescription("sku already exists");
+    });
   });
 });

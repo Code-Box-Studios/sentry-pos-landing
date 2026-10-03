@@ -33,7 +33,7 @@ export function RefundPinForm({
         name="pin"
         label="New refund PIN"
         error={state.fieldErrors?.pin}
-        hint="Exactly 6 digits. Four wrong attempts lock a terminal for five minutes."
+        hint="Exactly 6 digits. Four wrong attempts lock this person's PIN for five minutes."
       >
         <Input
           name="pin"

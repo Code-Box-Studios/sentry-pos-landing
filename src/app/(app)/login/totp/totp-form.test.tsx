@@ -8,7 +8,9 @@ import type { TotpEnableState } from "./actions";
 
 describe("TotpForm", () => {
   it("submits the code", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<TotpForm action={action} />);
 
     await userEvent.type(screen.getByLabelText("Authentication code"), "123456");
@@ -18,7 +20,9 @@ describe("TotpForm", () => {
   });
 
   it("accepts a recovery code, which is longer than six digits", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<TotpForm action={action} />);
 
     await userEvent.type(screen.getByLabelText("Authentication code"), "abcd-efgh-ijkl");
@@ -28,9 +32,9 @@ describe("TotpForm", () => {
   });
 
   it("reports an invalid code", async () => {
-    const action = vi.fn(
-      async (): Promise<FormState> => ({ message: "TOTP code or recovery code is invalid." }),
-    );
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(async () => ({
+      message: "TOTP code or recovery code is invalid.",
+    }));
     render(<TotpForm action={action} />);
 
     await userEvent.type(screen.getByLabelText("Authentication code"), "000000");
@@ -42,12 +46,10 @@ describe("TotpForm", () => {
 
 describe("SetupForm", () => {
   it("shows every recovery code once enrolment succeeds", async () => {
-    const action = vi.fn(
-      async (): Promise<TotpEnableState> => ({
-        done: true,
-        recoveryCodes: ["aaa-111", "bbb-222", "ccc-333"],
-      }),
-    );
+    const action = vi.fn(async (): Promise<TotpEnableState> => ({
+      done: true,
+      recoveryCodes: ["aaa-111", "bbb-222", "ccc-333"],
+    }));
     render(<SetupForm action={action} />);
 
     await userEvent.type(screen.getByLabelText("Six-digit code"), "123456");
@@ -59,9 +61,10 @@ describe("SetupForm", () => {
   });
 
   it("warns that the codes cannot be retrieved again", async () => {
-    const action = vi.fn(
-      async (): Promise<TotpEnableState> => ({ done: true, recoveryCodes: ["aaa-111"] }),
-    );
+    const action = vi.fn(async (): Promise<TotpEnableState> => ({
+      done: true,
+      recoveryCodes: ["aaa-111"],
+    }));
     render(<SetupForm action={action} />);
 
     await userEvent.type(screen.getByLabelText("Six-digit code"), "123456");

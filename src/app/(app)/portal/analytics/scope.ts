@@ -12,13 +12,16 @@ import type { AnalyticsScope } from "@/lib/api/types";
  * Defaults to the last 7 days ending today in Manila, so a bare
  * `/portal/analytics/overview` is a working page rather than a validation error.
  */
-export function readScope(params: {
-  businessId?: string;
-  branchId?: string;
-  from?: string;
-  to?: string;
-}): AnalyticsScope {
-  const today = todayInManila();
+export function readScope(
+  params: {
+    businessId?: string;
+    branchId?: string;
+    from?: string;
+    to?: string;
+  },
+  dayStartTime = "00:00",
+): AnalyticsScope {
+  const today = todayInManila(new Date(), dayStartTime);
 
   return {
     businessId: params.businessId,
@@ -30,10 +33,7 @@ export function readScope(params: {
 }
 
 /** The query string that carries a scope to another tab or to the CSV proxy. */
-export function scopeQuery(
-  scope: AnalyticsScope,
-  extra: Record<string, string> = {},
-): string {
+export function scopeQuery(scope: AnalyticsScope, extra: Record<string, string> = {}): string {
   const query = new URLSearchParams({
     from: scope.from,
     to: scope.to,

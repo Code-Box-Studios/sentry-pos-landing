@@ -89,9 +89,11 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     'landing-content': LandingContent;
+    'legal-pages': LegalPage;
   };
   globalsSelect: {
     'landing-content': LandingContentSelect<false> | LandingContentSelect<true>;
+    'legal-pages': LegalPagesSelect<false> | LegalPagesSelect<true>;
   };
   locale: null;
   widgets: {
@@ -511,6 +513,35 @@ export interface LandingContent {
   createdAt?: string | null;
 }
 /**
+ * Enter reviewed policies and business details before publishing. Unpublished drafts are never shown to visitors.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legal-pages".
+ */
+export interface LegalPage {
+  id: number;
+  businessName?: string | null;
+  contactEmail?: string | null;
+  terms?: {
+    published?: boolean | null;
+    effectiveDate?: string | null;
+    /**
+     * Reviewed policy text. Separate paragraphs with a blank line.
+     */
+    body?: string | null;
+  };
+  privacy?: {
+    published?: boolean | null;
+    effectiveDate?: string | null;
+    /**
+     * Reviewed policy text. Separate paragraphs with a blank line.
+     */
+    body?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "landing-content_select".
  */
@@ -639,6 +670,31 @@ export interface LandingContentSelect<T extends boolean = true> {
               id?: T;
             };
         copyright?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legal-pages_select".
+ */
+export interface LegalPagesSelect<T extends boolean = true> {
+  businessName?: T;
+  contactEmail?: T;
+  terms?:
+    | T
+    | {
+        published?: T;
+        effectiveDate?: T;
+        body?: T;
+      };
+  privacy?:
+    | T
+    | {
+        published?: T;
+        effectiveDate?: T;
+        body?: T;
       };
   updatedAt?: T;
   createdAt?: T;

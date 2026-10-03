@@ -67,10 +67,10 @@ describe("toOptions", () => {
 
 describe("ReceiveForm", () => {
   it("posts the branch, the target and the quantity", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
-    render(
-      <ReceiveForm action={action} businessId="b-1" branchId="br-1" options={OPTIONS} />,
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
     );
+    render(<ReceiveForm action={action} businessId="b-1" branchId="br-1" options={OPTIONS} />);
 
     await userEvent.selectOptions(screen.getByLabelText("Product"), "p-1");
     await userEvent.type(screen.getByLabelText("Quantity received"), "2.5");
@@ -85,10 +85,10 @@ describe("ReceiveForm", () => {
   });
 
   it("posts a variant target as productId:variantId", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
-    render(
-      <ReceiveForm action={action} businessId="b-1" branchId="br-1" options={OPTIONS} />,
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
     );
+    render(<ReceiveForm action={action} businessId="b-1" branchId="br-1" options={OPTIONS} />);
 
     await userEvent.selectOptions(screen.getByLabelText("Product"), "p-2:v-1");
     await userEvent.type(screen.getByLabelText("Quantity received"), "1");
@@ -98,14 +98,10 @@ describe("ReceiveForm", () => {
   });
 
   it("shows a quantity error on the quantity field", async () => {
-    const action = vi.fn(
-      async (): Promise<FormState> => ({
-        fieldErrors: { qty: "Enter a quantity above zero, with at most 3 decimals." },
-      }),
-    );
-    render(
-      <ReceiveForm action={action} businessId="b-1" branchId="br-1" options={OPTIONS} />,
-    );
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(async () => ({
+      fieldErrors: { qty: "Enter a quantity above zero, with at most 3 decimals." },
+    }));
+    render(<ReceiveForm action={action} businessId="b-1" branchId="br-1" options={OPTIONS} />);
 
     await userEvent.click(screen.getByRole("button", { name: "Receive stock" }));
     expect(await screen.findByLabelText("Quantity received")).toHaveAccessibleDescription(
@@ -121,7 +117,9 @@ describe("AdjustForm", () => {
   });
 
   it("posts the new count and the reason", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<AdjustForm action={action} businessId="b-1" branchId="br-1" options={OPTIONS} />);
 
     await userEvent.selectOptions(screen.getByLabelText("Product"), "p-1");
@@ -138,15 +136,9 @@ describe("AdjustForm", () => {
 
   it("offers every reason the API accepts", () => {
     render(<AdjustForm action={vi.fn()} businessId="b-1" branchId="br-1" options={OPTIONS} />);
-    const values = Array.from(
-      screen.getByLabelText("Reason").querySelectorAll("option"),
-    ).map((option) => option.value);
-    expect(values).toEqual([
-      "damage",
-      "expiry",
-      "theft_loss",
-      "count_correction",
-      "other",
-    ]);
+    const values = Array.from(screen.getByLabelText("Reason").querySelectorAll("option")).map(
+      (option) => option.value,
+    );
+    expect(values).toEqual(["damage", "expiry", "theft_loss", "count_correction", "other"]);
   });
 });

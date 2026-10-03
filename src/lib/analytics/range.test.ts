@@ -55,3 +55,9 @@ describe("todayInManila", () => {
     expect(todayInManila(new Date("2026-03-15T15:00:00Z"))).toBe("2026-03-15");
   });
 });
+
+// A 06:00 business is still trading yesterday before the cutoff.
+it("uses the active business day before and at its cutoff", () => {
+  expect(todayInManila(new Date("2026-09-14T18:00:00Z"), "06:00")).toBe("2026-09-14");
+  expect(todayInManila(new Date("2026-09-14T22:00:00Z"), "06:00")).toBe("2026-09-15");
+});

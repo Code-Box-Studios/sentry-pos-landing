@@ -3,6 +3,7 @@ import { AppShell } from "@/components/app/app-shell";
 import { BusinessSwitcher } from "@/components/app/business-switcher";
 import { NotFoundError } from "@/lib/api/errors";
 import { getBusiness, listBusinesses } from "@/lib/api/portal";
+import { businessNav } from "@/components/app/portal-nav";
 
 export default async function BusinessLayout({
   children,
@@ -23,25 +24,11 @@ export default async function BusinessLayout({
   }
 
   const businesses = await listBusinesses();
-  const base = `/portal/businesses/${businessId}`;
 
   return (
     <AppShell
       title={business.name}
-      // Each section is added here by the task that creates its route — a nav entry
-      // pointing at a page that does not exist yet is just a link to a 404.
-      nav={[
-        { href: base, label: "Overview" },
-        { href: `${base}/catalog`, label: "Products" },
-        { href: `${base}/categories`, label: "Categories" },
-        { href: `${base}/modifiers`, label: "Modifiers" },
-        { href: `${base}/discounts`, label: "Discounts" },
-        { href: `${base}/branches`, label: "Branches" },
-        { href: `${base}/terminals`, label: "Terminals" },
-        { href: `${base}/activity`, label: "Activity" },
-        { href: `${base}/settings`, label: "Settings" },
-        { href: "/portal", label: "← All businesses" },
-      ]}
+      nav={businessNav(businessId, "owner")}
       aside={
         <BusinessSwitcher
           businesses={businesses.map((b) => ({ id: b.id, name: b.name }))}

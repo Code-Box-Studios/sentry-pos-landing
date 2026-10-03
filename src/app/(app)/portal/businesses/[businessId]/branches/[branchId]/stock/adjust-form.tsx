@@ -21,7 +21,7 @@ const REASONS = [
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" size="sm" variant="secondary" disabled={pending}>
+    <Button className="rounded-full" type="submit" size="sm" variant="secondary" disabled={pending}>
       {pending ? "Adjusting…" : "Record adjustment"}
     </Button>
   );

@@ -23,7 +23,9 @@ function discount(overrides: Partial<Discount> = {}): Discount {
 
 describe("DiscountForm", () => {
   it("creates a percentage discount", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<DiscountForm action={action} businessId="b-1" />);
 
     await userEvent.type(screen.getByLabelText("Name"), "Happy hour");
@@ -63,7 +65,9 @@ describe("DiscountForm", () => {
   });
 
   it("carries the id and scope when editing", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(
       <DiscountForm
         action={action}
@@ -82,11 +86,9 @@ describe("DiscountForm", () => {
   });
 
   it("puts a value error on the value field", async () => {
-    const action = vi.fn(
-      async (): Promise<FormState> => ({
-        fieldErrors: { value: "Enter a whole percentage between 1 and 100." },
-      }),
-    );
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(async () => ({
+      fieldErrors: { value: "Enter a whole percentage between 1 and 100." },
+    }));
     render(<DiscountForm action={action} businessId="b-1" />);
 
     await userEvent.click(screen.getByRole("button", { name: "Add discount" }));

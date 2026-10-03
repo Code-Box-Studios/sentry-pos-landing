@@ -156,6 +156,21 @@ export function ProductForm({
             hint="Counts quantity per branch and blocks a sale that would go negative."
             defaultChecked={product?.trackStock ?? false}
           />
+          <Field
+            name="lowStockThreshold"
+            label="Low-stock alert threshold"
+            error={state.fieldErrors?.lowStockThreshold}
+            hint="Notify when branch stock falls below this quantity. Applies to each variant. Leave blank to disable alerts; stock tracking must be enabled."
+          >
+            <Input
+              name="lowStockThreshold"
+              type="number"
+              min="0"
+              max="9999999.999"
+              step="0.001"
+              defaultValue={product?.lowStockThreshold ?? ""}
+            />
+          </Field>
           <Toggle
             name="trackExpiry"
             label="Track expiry"

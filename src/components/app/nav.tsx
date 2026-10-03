@@ -20,7 +20,7 @@ export function Nav({ items }: { items: NavItem[] }) {
   return (
     <nav aria-label="Sections" className="space-y-0.5">
       {items.map((item) => {
-        const isRoot = item.href === "/admin" || item.href === "/portal";
+        const isRoot = item.href === "/admin" || item.href === "/portal" || item.href === "/portal/manager";
         const current =
           pathname === item.href || (!isRoot && pathname.startsWith(`${item.href}/`));
 

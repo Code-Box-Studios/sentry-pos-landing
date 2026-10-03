@@ -50,6 +50,8 @@ export interface BusinessInput {
   serviceChargeRate?: number;
   /** "HH:mm", 24-hour. */
   dayStartTime?: string;
+  dailySummaryEnabled?: boolean;
+  blindCloseEnabled?: boolean;
   allowMiscItems?: boolean;
   expiryWarningDays?: number;
   receiptHeader?: string;
@@ -118,11 +120,10 @@ export interface ProductInput {
   priceC: number;
   costC?: number;
   soldBy?: SoldBy;
-  lowStockThreshold?: number;
+  lowStockThreshold?: number | null;
   trackStock?: boolean;
   trackExpiry?: boolean;
   active?: boolean;
-  imagePath?: string;
   /** Replace-set. Omit the key to leave existing variants untouched. */
   variants?: VariantInput[];
 }

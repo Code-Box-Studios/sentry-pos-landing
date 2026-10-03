@@ -55,6 +55,7 @@ export async function receiveStockAction(
   }
 
   revalidatePath(`/portal/businesses/${businessId}/branches/${branchId}/stock`);
+  revalidatePath("/portal/manager/stock");
   return { done: true };
 }
 
@@ -93,5 +94,6 @@ export async function adjustStockAction(
   }
 
   revalidatePath(`/portal/businesses/${businessId}/branches/${branchId}/stock`);
+  revalidatePath("/portal/manager/stock");
   return { done: true };
 }

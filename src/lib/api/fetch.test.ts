@@ -6,9 +6,8 @@ vi.mock("@/lib/auth/session", () => ({
 }));
 
 const { apiFetch, apiBaseUrl } = await import("./fetch");
-const { ConflictError, NetworkError, UnauthorizedError, ValidationError } = await import(
-  "./errors"
-);
+const { ConflictError, NetworkError, UnauthorizedError, ValidationError } =
+  await import("./errors");
 
 /**
  * One-shot fetch stub. Each call returns a freshly minted Response — a Response body can
@@ -124,7 +123,7 @@ describe("apiFetch", () => {
       (e: unknown) => e,
     );
     expect(err).toBeInstanceOf(ValidationError);
-    expect((err as ValidationError).requestId).toBe("req-9");
+    expect((err as InstanceType<typeof ValidationError>).requestId).toBe("req-9");
   });
 
   it("maps a 409 onto ConflictError so a duplicate email lands on the field", async () => {
@@ -139,7 +138,9 @@ describe("apiFetch", () => {
 
   it("survives a non-JSON error body instead of throwing a parse error", async () => {
     stubFetch(() => ({ status: 502, text: "<html>Bad Gateway</html>" }));
-    const err = (await apiFetch("/portal/businesses").catch((e: unknown) => e)) as ConflictError;
+    const err = (await apiFetch("/portal/businesses").catch((e: unknown) => e)) as InstanceType<
+      typeof ConflictError
+    >;
     expect(err.code).toBe("internal_error");
     expect(err.status).toBe(502);
   });
@@ -151,4 +152,15 @@ describe("apiFetch", () => {
     );
     await expect(apiFetch("/portal/businesses")).rejects.toBeInstanceOf(NetworkError);
   });
+});
+
+it("sends multipart uploads with cookie authentication and a generated boundary", async () => {
+  const spy = stubFetch(() => ({ status: 200, body: { url: "image" } }));
+  const form = new FormData();
+  form.set("file", new File(["image"], "photo.png", { type: "image/png" }));
+  await apiFetch("/portal/products/p/image", { method: "POST", body: form });
+  const [, init] = spy.mock.calls[0] as unknown as [URL, RequestInit];
+  expect(init.body).toBe(form);
+  expect(new Headers(init.headers).has("content-type")).toBe(false);
+  expect(new Headers(init.headers).get("authorization")).toBe("Bearer session-access-token");
 });

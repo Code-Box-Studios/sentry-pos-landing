@@ -6,7 +6,9 @@ import type { FormState } from "@/lib/forms/form-state";
 
 describe("NewOwnerForm", () => {
   it("submits the three fields the API needs", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<NewOwnerForm action={action} />);
 
     await userEvent.type(screen.getByLabelText("Business owner name"), "Kape Diaria");
@@ -22,11 +24,9 @@ describe("NewOwnerForm", () => {
   });
 
   it("puts a duplicate email on the email field, where it can be corrected", async () => {
-    const action = vi.fn(
-      async (): Promise<FormState> => ({
-        fieldErrors: { email: "This email is already in use." },
-      }),
-    );
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(async () => ({
+      fieldErrors: { email: "This email is already in use." },
+    }));
     render(<NewOwnerForm action={action} />);
 
     await userEvent.type(screen.getByLabelText("Business owner name"), "X");

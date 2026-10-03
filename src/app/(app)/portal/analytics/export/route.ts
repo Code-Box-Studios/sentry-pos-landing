@@ -33,7 +33,16 @@ const REPORTS: Record<string, string> = {
 };
 
 /** Only these reach the API; anything else in the query is dropped. */
-const FORWARDED = ["from", "to", "businessId", "branchId", "granularity"];
+const FORWARDED = [
+  "from",
+  "to",
+  "businessId",
+  "branchId",
+  "granularity",
+  "by",
+  "type",
+  "productId",
+];
 
 export async function GET(request: Request): Promise<Response> {
   const incoming = new URL(request.url).searchParams;
@@ -71,10 +80,8 @@ export async function GET(request: Request): Promise<Response> {
   return new Response(upstream.body, {
     status: 200,
     headers: {
-      "Content-Type":
-        upstream.headers.get("Content-Type") ?? "text/csv; charset=utf-8",
-      "Content-Disposition":
-        upstream.headers.get("Content-Disposition") ?? "attachment",
+      "Content-Type": upstream.headers.get("Content-Type") ?? "text/csv; charset=utf-8",
+      "Content-Disposition": upstream.headers.get("Content-Disposition") ?? "attachment",
       "Cache-Control": "no-store",
     },
   });

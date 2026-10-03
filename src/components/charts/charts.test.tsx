@@ -53,18 +53,14 @@ describe("CalendarHeatmap", () => {
   ];
 
   it("renders one cell per day, titled with its date and amount", () => {
-    const { container } = render(
-      <CalendarHeatmap days={days} title="Daily sales" />,
-    );
+    const { container } = render(<CalendarHeatmap days={days} title="Daily sales" />);
     const cell = container.querySelector('[data-date="2026-03-02"]');
     expect(cell?.getAttribute("title")).toContain("2026-03-02");
     expect(cell?.getAttribute("title")).toContain("1.00");
   });
 
   it("renders every day given, including quiet ones", () => {
-    const { container } = render(
-      <CalendarHeatmap days={days} title="Daily sales" />,
-    );
+    const { container } = render(<CalendarHeatmap days={days} title="Daily sales" />);
     expect(container.querySelectorAll("[data-date]")).toHaveLength(2);
   });
 
@@ -97,4 +93,18 @@ describe("BarRow", () => {
     render(<BarRow rows={[]} title="By payment method" />);
     expect(screen.getByText(/nothing in this period/i)).toBeInTheDocument();
   });
+});
+
+it("makes a heatmap day a keyboard-accessible report drilldown", () => {
+  render(
+    <CalendarHeatmap
+      title="Daily sales"
+      days={[{ date: "2026-09-14", value: 100 }]}
+      dayHref={(date) => `/portal/analytics/sales?from=${date}&to=${date}`}
+    />,
+  );
+  expect(screen.getByRole("link", { name: /2026-09-14/ })).toHaveAttribute(
+    "href",
+    "/portal/analytics/sales?from=2026-09-14&to=2026-09-14",
+  );
 });

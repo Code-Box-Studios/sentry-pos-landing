@@ -1,3 +1,4 @@
+import { loadScope } from "../load-scope";
 import { EmptyState } from "@/components/app/empty-state";
 import { ScopeSelector } from "@/components/app/scope-selector";
 import { TrendLine } from "@/components/charts/trend-line";
@@ -9,7 +10,6 @@ import { ValidationError } from "@/lib/api/errors";
 import { listBranches, listBusinesses } from "@/lib/api/portal";
 import { formatPercentOr, formatPesosOr } from "@/lib/money";
 import type { MarginFigures } from "@/lib/api/types";
-import { readScope } from "../scope";
 
 /** The four money columns every margin table shares. */
 function MarginCells({ row }: { row: MarginFigures }) {
@@ -17,12 +17,8 @@ function MarginCells({ row }: { row: MarginFigures }) {
     <>
       <TD className="text-right tabular-nums">{formatPesosOr(row.revenueC)}</TD>
       <TD className="text-right tabular-nums">{formatPesosOr(row.costC)}</TD>
-      <TD className="text-right tabular-nums">
-        {formatPesosOr(row.grossProfitC)}
-      </TD>
-      <TD className="text-right tabular-nums">
-        {formatPercentOr(row.marginPct)}
-      </TD>
+      <TD className="text-right tabular-nums">{formatPesosOr(row.grossProfitC)}</TD>
+      <TD className="text-right tabular-nums">{formatPercentOr(row.marginPct)}</TD>
     </>
   );
 }
@@ -48,7 +44,7 @@ export default async function ProfitPage({
   }>;
 }) {
   const params = await searchParams;
-  const scope = readScope(params);
+  const scope = await loadScope(params);
   const granularity = params.granularity ?? "day";
 
   const [businesses, branches] = await Promise.all([
@@ -63,11 +59,7 @@ export default async function ProfitPage({
     if (error instanceof ValidationError) {
       return (
         <div className="space-y-6">
-          <ScopeSelector
-            businesses={businesses}
-            branches={branches}
-            scope={scope}
-          />
+          <ScopeSelector businesses={businesses} branches={branches} scope={scope} />
           <Alert>{error.message}</Alert>
         </div>
       );
@@ -77,11 +69,7 @@ export default async function ProfitPage({
 
   return (
     <div className="space-y-6">
-      <ScopeSelector
-        businesses={businesses}
-        branches={branches}
-        scope={scope}
-      />
+      <ScopeSelector businesses={businesses} branches={branches} scope={scope} />
 
       <Card>
         <CardHeader>
@@ -138,10 +126,7 @@ export default async function ProfitPage({
         </CardHeader>
         <CardBody>
           {report.byCategory.length === 0 ? (
-            <EmptyState
-              title="No category sales"
-              body="Nothing sold in this period."
-            />
+            <EmptyState title="No category sales" body="Nothing sold in this period." />
           ) : (
             <Table>
               <THead>
@@ -165,8 +150,8 @@ export default async function ProfitPage({
 
       <p className="text-sm text-steel">
         Profit covers {formatPesosOr(report.costedRevenueC)} of sales;{" "}
-        {formatPesosOr(report.uncostedRevenueC)} has no cost recorded, so its
-        margin is unknown rather than zero.
+        {formatPesosOr(report.uncostedRevenueC)} has no cost recorded, so its margin is unknown
+        rather than zero.
       </p>
     </div>
   );

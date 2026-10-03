@@ -1,3 +1,8 @@
+import { randomUUID } from "node:crypto";
+import { ResetDemoForm } from "../../../settings/lifecycle-forms";
+import { getMedia } from "@/lib/api/media";
+import { MediaForm } from "../../../media/media-form";
+import { DeleteBusinessForm } from "../../new/business-form";
 import Link from "next/link";
 import { getBusiness } from "@/lib/api/portal";
 import { saveBusinessSettingsAction } from "./actions";
@@ -10,6 +15,8 @@ export default async function BusinessSettingsPage({
 }) {
   const { businessId } = await params;
   const business = await getBusiness(businessId);
+
+  const asset = await getMedia("business", businessId);
 
   return (
     <div className="space-y-6">
@@ -25,6 +32,9 @@ export default async function BusinessSettingsPage({
       </div>
 
       <BusinessSettingsForm action={saveBusinessSettingsAction} business={business} />
+      <MediaForm kind="business" id={businessId} asset={asset} />
+      {business.isDemo && <ResetDemoForm businessId={businessId} requestId={randomUUID()} />}
+      <DeleteBusinessForm id={business.id} name={business.name} />
     </div>
   );
 }

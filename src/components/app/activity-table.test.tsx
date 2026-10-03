@@ -22,6 +22,10 @@ function entry(overrides: Partial<AuditEntry> = {}): AuditEntry {
 }
 
 describe("ActivityTable", () => {
+  it("shows the staff role snapshot on operational history", () => {
+    render(<ActivityTable entries={[entry({ actorType: "staff", metadata: { operatorRole: "cashier" } })]} />);
+    expect(screen.getByText("Cashier")).toBeInTheDocument();
+  });
   it("shows each entry's action, actor and Manila timestamp", () => {
     render(<ActivityTable entries={[entry()]} />);
     expect(screen.getByText("portal.product.create")).toBeInTheDocument();

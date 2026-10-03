@@ -1,23 +1,11 @@
 import Link from "next/link";
 import { AppShell } from "@/components/app/app-shell";
 import { EmptyState } from "@/components/app/empty-state";
-import type { NavItem } from "@/components/app/nav";
+import { PORTAL_NAV } from "@/components/app/portal-nav";
 import { Card } from "@/components/ui/card";
 import { TBody, TD, TH, THead, TR, Table } from "@/components/ui/table";
 import { listBusinesses } from "@/lib/api/portal";
 import { formatManilaDate } from "@/lib/format";
-
-/**
- * The portal's top-level nav, shared by the dashboard, this list and every
- * analytics tab. One definition, so a new section cannot appear in some places
- * and not others.
- */
-export const PORTAL_NAV: NavItem[] = [
-  { href: "/portal", label: "Dashboard" },
-  { href: "/portal/analytics/overview", label: "Analytics" },
-  { href: "/portal/businesses", label: "Businesses" },
-  { href: "/portal/settings", label: "Settings" },
-];
 
 /**
  * Every business on the account.
@@ -36,16 +24,22 @@ export default async function BusinessListPage() {
         <div>
           <h1 className="text-xl font-semibold text-ink">Businesses</h1>
           <p className="mt-1 text-sm text-steel">
-            Every business on your account, including the demo one. Choose one to
-            manage its catalogue, branches and settings.
+            Every business on your account, including the demo one. Choose one to manage its
+            catalogue, branches and settings.
           </p>
         </div>
 
+        <Link
+          href="/portal/businesses/new"
+          className="inline-block text-brand-green-dark hover:underline"
+        >
+          Create business →
+        </Link>
         <Card>
           {businesses.length === 0 ? (
             <EmptyState
               title="No businesses yet"
-              body="A demo business is created when your account is activated. If you cannot see one, contact support."
+              body="Create your business to start setting up branches and products."
             />
           ) : (
             <Table>
@@ -71,9 +65,7 @@ export default async function BusinessListPage() {
                       ) : null}
                     </TD>
                     <TD className="text-steel">{business.type}</TD>
-                    <TD className="text-steel">
-                      {formatManilaDate(business.createdAt)}
-                    </TD>
+                    <TD className="text-steel">{formatManilaDate(business.createdAt)}</TD>
                   </TR>
                 ))}
               </TBody>

@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { decodeJwtPayload, needsRefresh } from "@/lib/auth/jwt";
+import { managerPathAllowed } from "@/lib/auth/portal-access";
 
 /**
  * The guard for `/portal` and `/admin`, and the ONLY place that refreshes a token.
@@ -60,15 +61,20 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // rejects it, so treat it as no session at all.
   if (!payload || payload.kind === "preauth") return signOut(request, pathname + search);
 
+  if (!["platform_admin", "owner", "manager"].includes(payload.role ?? "")) return signOut(request, pathname + search);
   const isAdmin = payload.role === "platform_admin";
+  const isManager = payload.role === "manager";
+  let destination: string | null = null;
   if (wantsAdmin && !isAdmin) {
-    return NextResponse.redirect(new URL("/portal", request.nextUrl));
+    destination = isManager ? "/portal/manager" : "/portal";
   }
   if (!wantsAdmin && isAdmin) {
-    return NextResponse.redirect(new URL("/admin", request.nextUrl));
+    destination = "/admin";
   }
+  if (!wantsAdmin && isManager && !managerPathAllowed(pathname)) destination = "/portal/manager";
+  if (!wantsAdmin && payload.role === "owner" && pathname.startsWith("/portal/manager")) destination = "/portal";
 
-  const response = NextResponse.next({ request: { headers: request.headers } });
+  const response = destination ? NextResponse.redirect(new URL(destination, request.nextUrl)) : NextResponse.next({ request: { headers: request.headers } });
   if (rotated) {
     setSessionCookie(response, ACCESS_COOKIE, rotated.accessToken);
     setSessionCookie(response, REFRESH_COOKIE, rotated.refreshToken);

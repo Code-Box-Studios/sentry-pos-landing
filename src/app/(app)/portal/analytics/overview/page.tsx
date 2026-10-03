@@ -1,12 +1,12 @@
+import { loadScope, loadAnalyticsChoices } from "../load-scope";
 import { KpiCard } from "@/components/app/kpi-card";
 import { ScopeSelector } from "@/components/app/scope-selector";
 import { Alert } from "@/components/ui/alert";
 import { getOverview } from "@/lib/api/analytics";
 import { ValidationError } from "@/lib/api/errors";
-import { listBranches, listBusinesses } from "@/lib/api/portal";
 import { formatPercentOr, formatPesosOr, formatPointsOr } from "@/lib/money";
 import type { Kpi, NullableKpi } from "@/lib/api/types";
-import { readScope, scopeQuery } from "../scope";
+import { scopeQuery } from "../scope";
 
 /** "was ₱X · +12.0%" — the comparison in words, so no arrow needs decoding. */
 function moneyHint(kpi: Kpi | NullableKpi): string {
@@ -27,11 +27,8 @@ export default async function OverviewPage({
     to?: string;
   }>;
 }) {
-  const scope = readScope(await searchParams);
-  const [businesses, branches] = await Promise.all([
-    listBusinesses(),
-    scope.businessId ? listBranches(scope.businessId) : Promise.resolve([]),
-  ]);
+  const scope = await loadScope(await searchParams);
+  const { businesses, branches, role } = await loadAnalyticsChoices(scope.businessId);
 
   let report;
   try {
@@ -40,11 +37,7 @@ export default async function OverviewPage({
     if (error instanceof ValidationError) {
       return (
         <div className="space-y-6">
-          <ScopeSelector
-            businesses={businesses}
-            branches={branches}
-            scope={scope}
-          />
+          <ScopeSelector businesses={businesses} branches={branches} scope={scope} role={role} />
           <Alert>{error.message}</Alert>
         </div>
       );
@@ -54,11 +47,7 @@ export default async function OverviewPage({
 
   return (
     <div className="space-y-6">
-      <ScopeSelector
-        businesses={businesses}
-        branches={branches}
-        scope={scope}
-      />
+      <ScopeSelector businesses={businesses} branches={branches} scope={scope} role={role} />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <KpiCard
@@ -76,19 +65,19 @@ export default async function OverviewPage({
           value={formatPesosOr(report.netSalesC.value)}
           hint={moneyHint(report.netSalesC)}
         />
-        <KpiCard
+        {role === "owner" && <KpiCard
           title="Gross profit"
           value={formatPesosOr(report.grossProfitC.value)}
           hint={moneyHint(report.grossProfitC)}
-        />
-        <KpiCard
+        />}
+        {role === "owner" && <KpiCard
           title="Margin"
           value={formatPercentOr(report.marginPct.value)}
           // A margin is already a ratio, so its comparison is in POINTS.
           hint={`was ${formatPercentOr(report.marginPct.previous)} · ${formatPointsOr(
             report.marginPct.changePoints,
           )}`}
-        />
+        />}
         <KpiCard
           title="Transactions"
           value={String(report.transactions.value)}
@@ -111,11 +100,10 @@ export default async function OverviewPage({
         />
       </div>
 
-      <p className="text-sm text-steel">
+      {role === "owner" && <p className="text-sm text-steel">
         Profit covers {formatPesosOr(report.costedRevenueC)} of sales;{" "}
-        {formatPesosOr(report.uncostedRevenueC)} has no cost recorded, so its
-        margin is unknown.
-      </p>
+        {formatPesosOr(report.uncostedRevenueC)} has no cost recorded, so its margin is unknown.
+      </p>}
 
       <a
         href={`/portal/analytics/export?${scopeQuery(scope, { report: "overview" })}`}

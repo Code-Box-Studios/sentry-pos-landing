@@ -6,6 +6,7 @@ import type { NextConfig } from "next";
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
+  experimental: { serverActions: { bodySizeLimit: "5mb" } },
   // The portal is server-rendered — unlike pos/, which is a static export.
   images: {
     formats: ["image/avif", "image/webp"],

@@ -20,13 +20,17 @@ function terminal(overrides: Partial<Terminal> = {}): Terminal {
 
 describe("UnpairButton", () => {
   it("offers nothing to click for an already-unpaired terminal", () => {
-    render(<UnpairButton action={vi.fn()} businessId="b-1" terminal={terminal({ paired: false })} />);
+    render(
+      <UnpairButton action={vi.fn()} businessId="b-1" terminal={terminal({ paired: false })} />,
+    );
     expect(screen.getByText("Not paired")).toBeInTheDocument();
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
 
   it("does not unpair on the first click", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<UnpairButton action={action} businessId="b-1" terminal={terminal()} />);
 
     await userEvent.click(screen.getByRole("button", { name: "Unpair" }));
@@ -60,7 +64,9 @@ describe("UnpairButton", () => {
   });
 
   it("submits the terminal once confirmed", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<UnpairButton action={action} businessId="b-1" terminal={terminal()} />);
 
     await userEvent.click(screen.getByRole("button", { name: "Unpair" }));
@@ -79,7 +85,9 @@ describe("UnpairButton", () => {
   });
 
   it("backs out without unpairing", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<UnpairButton action={action} businessId="b-1" terminal={terminal()} />);
 
     await userEvent.click(screen.getByRole("button", { name: "Unpair" }));

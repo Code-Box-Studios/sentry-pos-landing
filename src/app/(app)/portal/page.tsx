@@ -1,3 +1,4 @@
+import { NotificationBell } from "./notifications/notification-bell";
 import Link from "next/link";
 import { AppShell } from "@/components/app/app-shell";
 import { EmptyState } from "@/components/app/empty-state";
@@ -8,7 +9,7 @@ import { TBody, TD, TH, THead, TR, Table } from "@/components/ui/table";
 import { getDashboard } from "@/lib/api/analytics";
 import { formatManilaDateTime } from "@/lib/format";
 import { formatPesosOr } from "@/lib/money";
-import { PORTAL_NAV } from "./businesses/page";
+import { PORTAL_NAV } from "@/components/app/portal-nav";
 
 /**
  * The portal landing (analytics-spec §0).
@@ -26,7 +27,10 @@ export default async function DashboardPage() {
     <AppShell title="Sentry" nav={PORTAL_NAV}>
       <div className="space-y-6">
         <div>
-          <h1 className="text-xl font-semibold text-ink">Today</h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-semibold text-ink">Today</h1>
+            <NotificationBell />
+          </div>
           <p className="mt-1 text-sm text-steel">
             Every business on your account, against the same day last week.
           </p>
@@ -64,9 +68,7 @@ export default async function DashboardPage() {
                       <Figure
                         label="Gross profit"
                         now={formatPesosOr(business.today.grossProfitC)}
-                        then={formatPesosOr(
-                          business.sameDayLastWeek.grossProfitC,
-                        )}
+                        then={formatPesosOr(business.sameDayLastWeek.grossProfitC)}
                       />
                       <Figure
                         label="Transactions"
@@ -96,28 +98,29 @@ export default async function DashboardPage() {
                               <TD className="text-right tabular-nums">
                                 {formatPesosOr(branch.salesC)}
                               </TD>
-                              <TD className="text-right tabular-nums">
-                                {branch.transactions}
-                              </TD>
+                              <TD className="text-right tabular-nums">{branch.transactions}</TD>
                             </TR>
                           ))}
                         </TBody>
                       </Table>
                     ) : null}
 
-                    {(lowStock && lowStock.count > 0) ||
-                    (unclosed && unclosed.count > 0) ? (
+                    {(lowStock && lowStock.count > 0) || (unclosed && unclosed.count > 0) ? (
                       <div className="flex flex-wrap gap-2">
                         {lowStock && lowStock.count > 0 ? (
-                          <Badge tone="warn">
-                            {lowStock.count} low on stock
-                          </Badge>
+                          <Link
+                            href={`/portal/analytics/inventory?businessId=${business.businessId}`}
+                          >
+                            <Badge tone="warn">{lowStock.count} low on stock</Badge>
+                          </Link>
                         ) : null}
                         {unclosed && unclosed.count > 0 ? (
-                          <Badge tone="warn">
-                            {unclosed.count} shift
-                            {unclosed.count === 1 ? "" : "s"} open over 24h
-                          </Badge>
+                          <Link href="#open-shifts">
+                            <Badge tone="warn">
+                              {unclosed.count} shift
+                              {unclosed.count === 1 ? "" : "s"} open over 24h
+                            </Badge>
+                          </Link>
                         ) : null}
                       </div>
                     ) : null}
@@ -137,15 +140,29 @@ export default async function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Right now</CardTitle>
+            <CardTitle>
+              <span id="open-shifts">Right now</span>
+            </CardTitle>
           </CardHeader>
           <CardBody className="space-y-3 text-sm">
             <p className="text-steel">
               {dashboard.live.openShifts.length} shift
-              {dashboard.live.openShifts.length === 1 ? "" : "s"} open ·{" "}
-              {pairedTerminals} of {dashboard.live.terminals.length} terminals
-              paired · {dashboard.live.unreadNotifications} unread notifications
+              {dashboard.live.openShifts.length === 1 ? "" : "s"} open · {pairedTerminals} of{" "}
+              {dashboard.live.terminals.length} terminals paired ·{" "}
+              {dashboard.live.unreadNotifications} unread notifications
             </p>
+            {dashboard.live.terminals.map((terminal) => (
+              <p key={terminal.terminalId}>
+                <Link
+                  className="text-brand-green-dark hover:underline"
+                  href={`/portal/businesses/${terminal.businessId}/terminals`}
+                >
+                  {terminal.name}
+                </Link>{" "}
+                · last seen{" "}
+                {terminal.lastSeenAt ? formatManilaDateTime(terminal.lastSeenAt) : "Never"}
+              </p>
+            ))}
             {dashboard.live.openShifts.map((shift) => (
               <p key={shift.shiftId} className="text-charcoal">
                 {shift.branchName} · {shift.terminalName} · opened{" "}
@@ -160,15 +177,7 @@ export default async function DashboardPage() {
 }
 
 /** Today's number with last week's beneath it, so the comparison needs no arrow. */
-function Figure({
-  label,
-  now,
-  then,
-}: {
-  label: string;
-  now: string;
-  then: string;
-}) {
+function Figure({ label, now, then }: { label: string; now: string; then: string }) {
   return (
     <div>
       <p className="text-xs text-steel">{label}</p>

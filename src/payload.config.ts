@@ -2,11 +2,14 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import { s3Storage } from "@payloadcms/storage-s3";
 import sharp from "sharp";
 import { buildConfig } from "payload";
 import { CmsUsers } from "./cms/collections/CmsUsers";
 import { Media } from "./cms/collections/Media";
 import { LandingContent } from "./cms/globals/LandingContent";
+import { cmsStorageOptions } from "./cms/storage/config";
+import { LegalPages } from "./cms/globals/LegalPages";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -23,7 +26,9 @@ export default buildConfig({
     },
   },
   collections: [CmsUsers, Media],
-  globals: [LandingContent],
+  globals: [LandingContent, LegalPages],
+  plugins: [s3Storage(cmsStorageOptions())],
+  upload: { limits: { fileSize: 4 * 1024 * 1024 } },
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET ?? "",
   typescript: {

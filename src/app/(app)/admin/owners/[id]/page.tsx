@@ -1,3 +1,4 @@
+import { EditOwnerForm } from "./edit-owner-form";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { OwnerStatusBadge } from "@/components/app/owner-status-badge";
@@ -45,8 +46,8 @@ export default async function OwnerDetailPage({
 
       {invited ? (
         <Alert tone="info">
-          An invitation has been emailed to {owner.email}. It expires in seven days. In
-          development no mail is sent — read the link from the backend&apos;s console output.
+          An invitation has been emailed to {owner.email}. It expires in seven days. In development
+          no mail is sent — read the link from the backend&apos;s console output.
         </Alert>
       ) : null}
 
@@ -56,6 +57,7 @@ export default async function OwnerDetailPage({
             <CardTitle>Account</CardTitle>
           </CardHeader>
           <CardBody className="space-y-2 text-sm">
+            <EditOwnerForm owner={owner} />
             <p className="text-steel">
               Business limit: <span className="text-charcoal">{owner.maxBusinesses}</span>
             </p>
@@ -116,9 +118,7 @@ export default async function OwnerDetailPage({
                     >
                       {business.name}
                     </Link>
-                    {business.isDemo ? (
-                      <span className="ml-2 text-xs text-stone">demo</span>
-                    ) : null}
+                    {business.isDemo ? <span className="ml-2 text-xs text-stone">demo</span> : null}
                   </TD>
                   <TD className="text-steel">{business.type}</TD>
                   <TD className="text-steel">{formatManilaDateTime(business.createdAt)}</TD>

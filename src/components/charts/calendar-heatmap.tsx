@@ -12,14 +12,14 @@ import { formatPesosOr } from "@/lib/money";
 export function CalendarHeatmap({
   days,
   title,
+  dayHref,
 }: {
   days: { date: string; value: number }[];
   title: string;
+  dayHref?: (date: string) => string;
 }) {
   if (days.length === 0) {
-    return (
-      <p className="py-8 text-center text-sm text-steel">No sales in this period.</p>
-    );
+    return <p className="py-8 text-center text-sm text-steel">No sales in this period.</p>;
   }
 
   const weeks = toHeatmapWeeks(days);
@@ -36,11 +36,13 @@ export function CalendarHeatmap({
                 ))
               : null}
             {week.map((cell) => (
-              <div
+              <a
+                href={dayHref?.(cell.date)}
+                aria-label={`${cell.date} · ${formatPesosOr(cell.value)}`}
                 key={cell.date}
                 data-date={cell.date}
                 title={`${cell.date} · ${formatPesosOr(cell.value)}`}
-                className="h-4 w-4 rounded-sm bg-brand-green-dark"
+                className="block h-4 w-4 rounded-sm bg-brand-green-dark"
                 // A floor keeps a zero day visible as a cell rather than a hole.
                 style={{ opacity: 0.12 + cell.intensity * 0.88 }}
               />

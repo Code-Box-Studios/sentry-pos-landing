@@ -6,7 +6,9 @@ import type { FormState } from "@/lib/forms/form-state";
 
 describe("PasswordSetForm", () => {
   it("sends the token from the link along with the password", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<PasswordSetForm action={action} token="tok-123" submitLabel="Activate account" />);
 
     await userEvent.type(screen.getByLabelText("New password"), "correct-horse");
@@ -20,11 +22,9 @@ describe("PasswordSetForm", () => {
   });
 
   it("shows a mismatch against the confirm field", async () => {
-    const action = vi.fn(
-      async (): Promise<FormState> => ({
-        fieldErrors: { confirm: "The two passwords do not match." },
-      }),
-    );
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(async () => ({
+      fieldErrors: { confirm: "The two passwords do not match." },
+    }));
     render(<PasswordSetForm action={action} token="t" submitLabel="Save password" />);
 
     await userEvent.type(screen.getByLabelText("New password"), "aaaaaaaa");
@@ -37,9 +37,9 @@ describe("PasswordSetForm", () => {
   });
 
   it("reports a dead link without hinting why it is dead", async () => {
-    const action = vi.fn(
-      async (): Promise<FormState> => ({ message: "This link is invalid or has expired." }),
-    );
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(async () => ({
+      message: "This link is invalid or has expired.",
+    }));
     render(<PasswordSetForm action={action} token="stale" submitLabel="Activate account" />);
 
     await userEvent.type(screen.getByLabelText("New password"), "correct-horse");

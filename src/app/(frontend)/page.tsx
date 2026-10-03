@@ -10,7 +10,7 @@ import { DeviceTrio } from "@/components/landing/mockups/DeviceTrio";
 import { PortalDashboard } from "@/components/landing/mockups/PortalDashboard";
 import { TaxSummary } from "@/components/landing/mockups/TaxSummary";
 
-const SIGNIN_URL = process.env.NEXT_PUBLIC_APP_SIGNIN_URL ?? "https://app.sentry.example/login";
+const SIGNIN_URL = process.env.NEXT_PUBLIC_APP_SIGNIN_URL ?? "/login";
 
 const PILL =
   "rounded-full bg-brand-green px-[26px] py-3 text-sm font-semibold text-ink whitespace-nowrap no-underline transition hover:bg-brand-green-hover hover:text-ink hover:-translate-y-0.5";

@@ -19,7 +19,9 @@ const GROUP: ModifierGroup = {
 
 describe("GroupForm", () => {
   it("creates a group with its options", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<GroupForm action={action} businessId="b-1" />);
 
     await userEvent.type(screen.getByLabelText("Group name"), "Size");
@@ -37,7 +39,9 @@ describe("GroupForm", () => {
   });
 
   it("shows an existing option's delta in pesos and keeps its id", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<GroupForm action={action} businessId="b-1" group={GROUP} />);
 
     expect(screen.getByLabelText("Price change")).toHaveValue("15.00");
@@ -47,7 +51,9 @@ describe("GroupForm", () => {
   });
 
   it("stops posting an option once removed", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<GroupForm action={action} businessId="b-1" group={GROUP} />);
 
     await userEvent.click(screen.getByRole("button", { name: "Remove" }));
@@ -57,11 +63,9 @@ describe("GroupForm", () => {
   });
 
   it("reports a min above max against the max field", async () => {
-    const action = vi.fn(
-      async (): Promise<FormState> => ({
-        fieldErrors: { maxSelect: "Maximum must be at least the minimum." },
-      }),
-    );
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(async () => ({
+      fieldErrors: { maxSelect: "Maximum must be at least the minimum." },
+    }));
     render(<GroupForm action={action} businessId="b-1" />);
 
     await userEvent.click(screen.getByRole("button", { name: "Create group" }));

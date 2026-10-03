@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import {
@@ -26,16 +26,23 @@ export function ScopeSelector({
   businesses,
   branches,
   scope,
+  role = "owner",
 }: {
-  businesses: Business[];
-  branches: Branch[];
+  businesses: Pick<Business, "id" | "name" | "dayStartTime">[];
+  branches: Pick<Branch, "id" | "name" | "businessId">[];
   scope: AnalyticsScope;
+  role?: "owner" | "manager";
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   function go(next: AnalyticsScope): void {
-    const query = new URLSearchParams({ from: next.from, to: next.to });
+    const query = new URLSearchParams(searchParams.toString());
+    for (const key of ["page", "from", "to", "businessId", "branchId"]) query.delete(key);
+    if (next.businessId !== scope.businessId) query.delete("productId");
+    query.set("from", next.from);
+    query.set("to", next.to);
     if (next.businessId) query.set("businessId", next.businessId);
     if (next.branchId) query.set("branchId", next.branchId);
     router.push(`${pathname}?${query.toString()}`);
@@ -51,6 +58,7 @@ export function ScopeSelector({
         <span className="mb-1 block text-steel">Business</span>
         <Select
           aria-label="Business"
+          disabled={role === "manager"}
           value={scope.businessId ?? ""}
           onChange={(event) =>
             go({
@@ -62,7 +70,7 @@ export function ScopeSelector({
             })
           }
         >
-          <option value="">All businesses</option>
+          {role !== "manager" && <option value="">All businesses</option>}
           {businesses.map((business) => (
             <option key={business.id} value={business.id}>
               {business.name}
@@ -77,11 +85,9 @@ export function ScopeSelector({
           <Select
             aria-label="Branch"
             value={scope.branchId ?? ""}
-            onChange={(event) =>
-              go({ ...scope, branchId: event.target.value || undefined })
-            }
+            onChange={(event) => go({ ...scope, branchId: event.target.value || undefined })}
           >
-            <option value="">All branches</option>
+            <option value="">{role === "manager" ? "All assigned branches" : "All branches"}</option>
             {visibleBranches.map((branch) => (
               <option key={branch.id} value={branch.id}>
                 {branch.name}
@@ -101,7 +107,10 @@ export function ScopeSelector({
               ...scope,
               ...resolvePreset(
                 event.target.value as RangePreset,
-                todayInManila(),
+                todayInManila(
+                  new Date(),
+                  businesses.find((b) => b.id === scope.businessId)?.dayStartTime,
+                ),
               ),
             })
           }

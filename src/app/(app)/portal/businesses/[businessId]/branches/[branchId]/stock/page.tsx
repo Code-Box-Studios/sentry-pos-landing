@@ -31,6 +31,7 @@ export default async function StockPage({
     throw error;
   }
 
+  if (branch.businessId !== businessId) notFound();
   const options = toOptions(products);
   const base = `/portal/businesses/${businessId}`;
 
@@ -46,6 +47,12 @@ export default async function StockPage({
         </p>
       </div>
 
+      <Link
+        className="inline-block text-brand-green-dark hover:underline"
+        href={`${base}/branches/${branchId}/stock/operations`}
+      >
+        Transfers, physical counts and expiry →
+      </Link>
       <Card>
         <CardHeader>
           <CardTitle>Levels</CardTitle>

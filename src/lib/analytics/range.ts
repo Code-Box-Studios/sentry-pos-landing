@@ -9,13 +9,7 @@
  * labels, not instants; parsing them in local time would shift them a day.
  */
 
-export type RangePreset =
-  | "today"
-  | "yesterday"
-  | "7d"
-  | "30d"
-  | "month"
-  | "custom";
+export type RangePreset = "today" | "yesterday" | "7d" | "30d" | "month" | "custom";
 
 export const PRESET_LABELS: Record<RangePreset, string> = {
   today: "Today",
@@ -31,20 +25,17 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const MANILA_OFFSET_MS = 8 * 60 * 60 * 1000;
 
 export function addDays(date: string, days: number): string {
-  return new Date(Date.parse(`${date}T00:00:00Z`) + days * MS_PER_DAY)
-    .toISOString()
-    .slice(0, 10);
+  return new Date(Date.parse(`${date}T00:00:00Z`) + days * MS_PER_DAY).toISOString().slice(0, 10);
 }
 
 /** Today's date in Manila, which is what an owner means by "today". */
-export function todayInManila(now: Date = new Date()): string {
-  return new Date(now.getTime() + MANILA_OFFSET_MS).toISOString().slice(0, 10);
+export function todayInManila(now: Date = new Date(), dayStartTime = "00:00"): string {
+  const [hours, minutes] = dayStartTime.split(":").map(Number);
+  const cutoff = (hours * 60 + minutes) * 60_000;
+  return new Date(now.getTime() + MANILA_OFFSET_MS - cutoff).toISOString().slice(0, 10);
 }
 
-export function resolvePreset(
-  preset: RangePreset,
-  today: string,
-): { from: string; to: string } {
+export function resolvePreset(preset: RangePreset, today: string): { from: string; to: string } {
   switch (preset) {
     case "yesterday": {
       const day = addDays(today, -1);

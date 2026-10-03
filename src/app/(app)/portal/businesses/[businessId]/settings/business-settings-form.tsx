@@ -44,6 +44,27 @@ export function BusinessSettingsForm({
       {state.done ? <Alert tone="info">Settings saved.</Alert> : null}
       {state.message ? <Alert>{state.message}</Alert> : null}
 
+      <label className="flex items-start gap-3 text-sm">
+        <input type="checkbox" name="blindCloseEnabled" defaultChecked={business.blindCloseEnabled ?? false} className="mt-1" />
+        <span><span className="block font-medium">Blind drawer close</span><span className="text-steel">Hide expected cash and cash totals until the operator submits their count. Applies to every terminal in this business.</span></span>
+      </label>
+
+      {!business.isDemo && (
+        <label className="flex items-start gap-3 text-sm">
+          <input
+            type="checkbox"
+            name="dailySummaryEnabled"
+            defaultChecked={business.dailySummaryEnabled ?? false}
+            className="mt-1"
+          />
+          <span>
+            <span className="block font-medium">Daily summary email</span>
+            <span className="text-steel">
+              Email your account address a summary after this business day closes.
+            </span>
+          </span>
+        </label>
+      )}
       <Card>
         <CardHeader>
           <CardTitle>Business</CardTitle>

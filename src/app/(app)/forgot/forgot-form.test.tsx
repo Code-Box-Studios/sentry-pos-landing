@@ -6,7 +6,9 @@ import type { FormState } from "@/lib/forms/form-state";
 
 describe("ForgotForm", () => {
   it("gives the same answer whether or not the account exists", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({ done: true }));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(async () => ({
+      done: true,
+    }));
     render(<ForgotForm action={action} />);
 
     await userEvent.type(screen.getByLabelText("Email address"), "nobody@nowhere.test");

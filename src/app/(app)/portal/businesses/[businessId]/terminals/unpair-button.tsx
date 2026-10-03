@@ -12,7 +12,7 @@ import type { Terminal } from "@/lib/api/types";
 function SubmitButton({ disabled }: { disabled: boolean }) {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" size="sm" variant="destructive" disabled={disabled || pending}>
+    <Button type="submit" size="sm" variant="destructive" className="rounded-full" disabled={disabled || pending}>
       {pending ? "Unpairing…" : "Unpair terminal"}
     </Button>
   );
@@ -44,7 +44,7 @@ export function UnpairButton({
     return (
       <div className="space-y-2">
         {state.message ? <Alert>{state.message}</Alert> : null}
-        <Button size="sm" variant="ghost" onClick={() => setArmed(true)}>
+        <Button size="sm" variant="ghost" className="rounded-full" onClick={() => setArmed(true)}>
           Unpair
         </Button>
       </div>
@@ -75,7 +75,7 @@ export function UnpairButton({
 
       <div className="flex gap-2">
         <SubmitButton disabled={typed.trim().toUpperCase() !== terminal.code.toUpperCase()} />
-        <Button size="sm" variant="ghost" onClick={() => setArmed(false)}>
+        <Button size="sm" variant="ghost" className="rounded-full" onClick={() => setArmed(false)}>
           Cancel
         </Button>
       </div>

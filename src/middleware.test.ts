@@ -50,6 +50,22 @@ describe("unauthenticated access", () => {
 });
 
 describe("role routing", () => {
+  it("routes managers to their workspace and denies owner-only and profit URLs", async () => {
+    for (const path of ["/portal", "/portal/settings", "/portal/businesses/b-1/staff", "/portal/analytics/profit", "/portal/analytics/leaks"]) {
+      const res = await middleware(request(path, { sentry_at: freshToken("manager") }));
+      expect(new URL(res.headers.get("location")!).pathname).toBe("/portal/manager");
+    }
+    for (const path of ["/portal/manager/stock", "/portal/analytics/sales"]) {
+      const res = await middleware(request(path, { sentry_at: freshToken("manager") }));
+      expect(res.headers.get("location")).toBeNull();
+    }
+  });
+  it("does not accept cashier or unknown roles as portal sessions", async () => {
+    for (const role of ["cashier", "unknown"]) {
+      const res = await middleware(request("/portal", { sentry_at: freshToken(role) }));
+      expect(new URL(res.headers.get("location")!).pathname).toBe("/login");
+    }
+  });
   it("lets an owner through to the portal", async () => {
     const res = await middleware(request("/portal", { sentry_at: freshToken("owner") }));
     expect(res.headers.get("location")).toBeNull();

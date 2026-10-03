@@ -6,7 +6,9 @@ import type { FormState } from "@/lib/forms/form-state";
 
 describe("ConfirmDelete", () => {
   it("does not delete on the first click", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<ConfirmDelete action={action} name="Drinks" hidden={{ id: "c-1" }} />);
 
     await userEvent.click(screen.getByRole("button", { name: "Delete" }));
@@ -14,7 +16,9 @@ describe("ConfirmDelete", () => {
   });
 
   it("names what is about to be deleted", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<ConfirmDelete action={action} name="Drinks" hidden={{ id: "c-1" }} />);
 
     await userEvent.click(screen.getByRole("button", { name: "Delete" }));
@@ -22,7 +26,9 @@ describe("ConfirmDelete", () => {
   });
 
   it("submits the hidden fields once confirmed", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<ConfirmDelete action={action} name="Drinks" hidden={{ id: "c-1" }} />);
 
     await userEvent.click(screen.getByRole("button", { name: "Delete" }));
@@ -32,7 +38,9 @@ describe("ConfirmDelete", () => {
   });
 
   it("backs out without deleting", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<ConfirmDelete action={action} name="Drinks" hidden={{ id: "c-1" }} />);
 
     await userEvent.click(screen.getByRole("button", { name: "Delete" }));
@@ -43,9 +51,9 @@ describe("ConfirmDelete", () => {
   });
 
   it("surfaces a refusal from the server, such as a category still in use", async () => {
-    const action = vi.fn(
-      async (): Promise<FormState> => ({ message: "Category still has products." }),
-    );
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(async () => ({
+      message: "Category still has products.",
+    }));
     render(<ConfirmDelete action={action} name="Drinks" hidden={{ id: "c-1" }} />);
 
     await userEvent.click(screen.getByRole("button", { name: "Delete" }));

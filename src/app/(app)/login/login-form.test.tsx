@@ -6,7 +6,9 @@ import type { FormState } from "@/lib/forms/form-state";
 
 describe("LoginForm", () => {
   it("submits what the user typed", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<LoginForm action={action} />);
 
     await userEvent.type(screen.getByLabelText("Email address"), "maria@kapediaria.ph");
@@ -19,7 +21,9 @@ describe("LoginForm", () => {
   });
 
   it("carries the requested destination through the form", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<LoginForm action={action} next="/portal/settings" />);
 
     await userEvent.type(screen.getByLabelText("Email address"), "a@b.co");
@@ -30,12 +34,10 @@ describe("LoginForm", () => {
   });
 
   it("shows how many attempts remain after a wrong password", async () => {
-    const action = vi.fn(
-      async (): Promise<FormState> => ({
-        message: "Credentials are incorrect.",
-        attemptsRemaining: 2,
-      }),
-    );
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(async () => ({
+      message: "Credentials are incorrect.",
+      attemptsRemaining: 2,
+    }));
     render(<LoginForm action={action} />);
 
     await userEvent.type(screen.getByLabelText("Email address"), "a@b.co");
@@ -48,9 +50,10 @@ describe("LoginForm", () => {
   });
 
   it("counts a lockout down in minutes instead of showing a bare failure", async () => {
-    const action = vi.fn(
-      async (): Promise<FormState> => ({ message: "Locked.", retryAfterSeconds: 300 }),
-    );
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(async () => ({
+      message: "Locked.",
+      retryAfterSeconds: 300,
+    }));
     render(<LoginForm action={action} />);
 
     await userEvent.type(screen.getByLabelText("Email address"), "a@b.co");
@@ -61,11 +64,9 @@ describe("LoginForm", () => {
   });
 
   it("puts a field error under its own input", async () => {
-    const action = vi.fn(
-      async (): Promise<FormState> => ({
-        fieldErrors: { email: "email must be an email" },
-      }),
-    );
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(async () => ({
+      fieldErrors: { email: "email must be an email" },
+    }));
     render(<LoginForm action={action} />);
 
     await userEvent.type(screen.getByLabelText("Email address"), "not-an-email");

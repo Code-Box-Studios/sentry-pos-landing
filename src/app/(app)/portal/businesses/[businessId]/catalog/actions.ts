@@ -10,7 +10,7 @@ import {
   type VariantInput,
 } from "@/lib/api/portal";
 import { toFormState, type FormState } from "@/lib/forms/form-state";
-import { pesosToCentavos } from "@/lib/money";
+import { parseQuantity, pesosToCentavos } from "@/lib/money";
 
 const PRODUCT_FIELDS = [
   "categoryId",
@@ -81,6 +81,18 @@ export async function saveProductAction(
     return { fieldErrors: { costC: "Enter a cost, or leave it blank." } };
   }
 
+  const rawThreshold = String(formData.get("lowStockThreshold") ?? "").trim();
+  const lowStockThreshold = rawThreshold === "" ? null : parseQuantity(rawThreshold);
+  if (
+    rawThreshold !== "" &&
+    (lowStockThreshold === null || lowStockThreshold < 0 || lowStockThreshold > 9999999.999)
+  )
+    return {
+      fieldErrors: {
+        lowStockThreshold:
+          "Enter zero or more, with at most 3 decimals, or leave blank to disable alerts.",
+      },
+    };
   const variantResult = variantsFrom(formData);
   if ("error" in variantResult) return { message: variantResult.error };
 
@@ -97,6 +109,7 @@ export async function saveProductAction(
     ...(barcode ? { barcode } : {}),
     soldBy: soldBy as "unit" | "weight",
     trackStock: formData.get("trackStock") === "on",
+    lowStockThreshold,
     trackExpiry: formData.get("trackExpiry") === "on",
     active: formData.get("active") === "on",
     // Replace-set: always send the full list, because this form always shows the full list.

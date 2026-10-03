@@ -1,3 +1,4 @@
+import { loadScope } from "../load-scope";
 import { EmptyState } from "@/components/app/empty-state";
 import { KpiCard } from "@/components/app/kpi-card";
 import { ScopeSelector } from "@/components/app/scope-selector";
@@ -11,16 +12,11 @@ import { listBranches, listBusinesses } from "@/lib/api/portal";
 import { formatManilaDateTime } from "@/lib/format";
 import { formatPercentOr, formatPesosOr } from "@/lib/money";
 import type { StatusBucket } from "@/lib/api/types";
-import { readScope, scopeQuery } from "../scope";
+import { scopeQuery } from "../scope";
 
 function ReasonTable({ bucket, noun }: { bucket: StatusBucket; noun: string }) {
   if (bucket.reasons.length === 0) {
-    return (
-      <EmptyState
-        title={`No ${noun}`}
-        body={`Nothing was ${noun} in this period.`}
-      />
-    );
+    return <EmptyState title={`No ${noun}`} body={`Nothing was ${noun} in this period.`} />;
   }
 
   return (
@@ -37,9 +33,7 @@ function ReasonTable({ bucket, noun }: { bucket: StatusBucket; noun: string }) {
           <TR key={reason.reason}>
             <TD className="text-charcoal">{reason.reason}</TD>
             <TD className="text-right tabular-nums">{reason.count}</TD>
-            <TD className="text-right tabular-nums">
-              {formatPesosOr(reason.valueC)}
-            </TD>
+            <TD className="text-right tabular-nums">{formatPesosOr(reason.valueC)}</TD>
           </TR>
         ))}
       </TBody>
@@ -57,7 +51,7 @@ export default async function LeaksPage({
     to?: string;
   }>;
 }) {
-  const scope = readScope(await searchParams);
+  const scope = await loadScope(await searchParams);
 
   const [businesses, branches] = await Promise.all([
     listBusinesses(),
@@ -71,11 +65,7 @@ export default async function LeaksPage({
     if (error instanceof ValidationError) {
       return (
         <div className="space-y-6">
-          <ScopeSelector
-            businesses={businesses}
-            branches={branches}
-            scope={scope}
-          />
+          <ScopeSelector businesses={businesses} branches={branches} scope={scope} />
           <Alert>{error.message}</Alert>
         </div>
       );
@@ -85,11 +75,7 @@ export default async function LeaksPage({
 
   return (
     <div className="space-y-6">
-      <ScopeSelector
-        businesses={businesses}
-        branches={branches}
-        scope={scope}
-      />
+      <ScopeSelector businesses={businesses} branches={branches} scope={scope} />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <KpiCard
@@ -147,12 +133,8 @@ export default async function LeaksPage({
                     <TR key={discount.discountId}>
                       <TD className="text-charcoal">{discount.name}</TD>
                       <TD className="text-steel">{discount.kind}</TD>
-                      <TD className="text-right tabular-nums">
-                        {discount.timesUsed}
-                      </TD>
-                      <TD className="text-right tabular-nums">
-                        {formatPesosOr(discount.amountC)}
-                      </TD>
+                      <TD className="text-right tabular-nums">{discount.timesUsed}</TD>
+                      <TD className="text-right tabular-nums">{formatPesosOr(discount.amountC)}</TD>
                     </TR>
                   ))}
                 </TBody>
@@ -207,15 +189,11 @@ export default async function LeaksPage({
                 {report.overShort.map((shift) => (
                   <TR key={shift.shiftId}>
                     <TD className="text-charcoal">{shift.branchName}</TD>
-                    <TD className="text-steel">
-                      {formatManilaDateTime(shift.closedAt)}
-                    </TD>
+                    <TD className="text-steel">{formatManilaDateTime(shift.closedAt)}</TD>
                     <TD className="text-right tabular-nums">
                       {formatPesosOr(shift.expectedCashC)}
                     </TD>
-                    <TD className="text-right tabular-nums">
-                      {formatPesosOr(shift.closingCashC)}
-                    </TD>
+                    <TD className="text-right tabular-nums">{formatPesosOr(shift.closingCashC)}</TD>
                     <TD
                       className={
                         shift.varianceC !== null && shift.varianceC < 0

@@ -6,7 +6,9 @@ import type { FormState } from "@/lib/forms/form-state";
 
 describe("RefundPinForm", () => {
   it("posts both fields so the action can compare them", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<RefundPinForm action={action} />);
 
     await userEvent.type(screen.getByLabelText("New refund PIN"), "123456");
@@ -26,11 +28,9 @@ describe("RefundPinForm", () => {
   });
 
   it("shows a mismatch against the confirm field", async () => {
-    const action = vi.fn(
-      async (): Promise<FormState> => ({
-        fieldErrors: { confirm: "The two PINs do not match." },
-      }),
-    );
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(async () => ({
+      fieldErrors: { confirm: "The two PINs do not match." },
+    }));
     render(<RefundPinForm action={action} />);
 
     await userEvent.type(screen.getByLabelText("New refund PIN"), "123456");
@@ -43,7 +43,9 @@ describe("RefundPinForm", () => {
   });
 
   it("confirms success without echoing the PIN back", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({ done: true }));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(async () => ({
+      done: true,
+    }));
     render(<RefundPinForm action={action} />);
 
     await userEvent.type(screen.getByLabelText("New refund PIN"), "123456");

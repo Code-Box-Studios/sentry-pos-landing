@@ -11,6 +11,12 @@ const ITEMS = [
 ];
 
 describe("Nav", () => {
+  it("marks manager stock without also marking its dashboard", () => {
+    pathname.current = "/portal/manager/stock";
+    render(<Nav items={[{ href: "/portal/manager", label: "Dashboard" }, { href: "/portal/manager/stock", label: "Stock" }]} />);
+    expect(screen.getByRole("link", { name: "Stock" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Dashboard" })).not.toHaveAttribute("aria-current");
+  });
   it("marks the section you are in", () => {
     pathname.current = "/admin/settings";
     render(<Nav items={ITEMS} />);

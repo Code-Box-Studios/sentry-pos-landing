@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Figtree, Source_Code_Pro } from "next/font/google";
 import { getLandingContent } from "@/lib/landing";
+import { siteUrl } from "@/lib/site-url";
 import "../globals.css";
 
 // design-spec names Euclid Circular A, whose licensing is pending; Figtree is the stand-in the
@@ -21,13 +22,18 @@ const sourceCodePro = Source_Code_Pro({
 export async function generateMetadata(): Promise<Metadata> {
   const { meta } = await getLandingContent();
   return {
+    metadataBase: siteUrl(),
+    alternates: { canonical: "/" },
     title: meta.title,
     description: meta.description,
     openGraph: {
       title: meta.title,
       description: meta.description,
       type: "website",
+      siteName: "Sentry",
+      locale: "en_PH",
     },
+    twitter: { card: "summary_large_image", title: meta.title, description: meta.description },
   };
 }
 

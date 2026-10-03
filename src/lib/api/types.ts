@@ -37,6 +37,8 @@ export interface Business {
   allowMiscItems: boolean;
   isDemo: boolean;
   dayStartTime: string;
+  dailySummaryEnabled?: boolean;
+  blindCloseEnabled?: boolean;
   expiryWarningDays: number;
   logoPath: string | null;
   receiptHeader: string;
@@ -55,7 +57,7 @@ export interface Branch {
   address: string;
 }
 
-export type ActorType = "owner" | "terminal" | "platform_admin";
+export type ActorType = "owner" | "staff" | "terminal" | "platform_admin";
 
 export interface AuditEntry {
   id: string;

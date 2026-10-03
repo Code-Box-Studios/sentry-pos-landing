@@ -18,7 +18,9 @@ const BRANCH: Branch = {
 
 describe("BranchForm", () => {
   it("creates a branch with its code and address", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<BranchForm action={action} businessId="b-1" />);
 
     await userEvent.type(screen.getByLabelText("Branch name"), "Bayanihan");
@@ -34,7 +36,9 @@ describe("BranchForm", () => {
   });
 
   it("passes a lowercase code through — the action uppercases it", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<BranchForm action={action} businessId="b-1" />);
 
     await userEvent.type(screen.getByLabelText("Code"), "byn");
@@ -50,7 +54,9 @@ describe("BranchForm", () => {
   });
 
   it("still posts the code when editing, so the action's guard passes", async () => {
-    const action = vi.fn(async (): Promise<FormState> => ({}));
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(<BranchForm action={action} businessId="b-1" branch={BRANCH} />);
 
     await userEvent.click(screen.getByRole("button", { name: "Save" }));
@@ -61,11 +67,9 @@ describe("BranchForm", () => {
   });
 
   it("puts a duplicate code on the code field", async () => {
-    const action = vi.fn(
-      async (): Promise<FormState> => ({
-        fieldErrors: { code: "Use 2–6 uppercase letters or digits, for example MKT." },
-      }),
-    );
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(async () => ({
+      fieldErrors: { code: "Use 2–6 uppercase letters or digits, for example MKT." },
+    }));
     render(<BranchForm action={action} businessId="b-1" />);
 
     await userEvent.click(screen.getByRole("button", { name: "Add branch" }));

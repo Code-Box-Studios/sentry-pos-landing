@@ -8,7 +8,9 @@ const noop = async (): Promise<FormState> => ({});
 
 describe("StatusControls", () => {
   it("does not suspend on a single click — the tier must be confirmed", async () => {
-    const suspend = vi.fn(async (): Promise<FormState> => ({}));
+    const suspend = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(
       <StatusControls
         ownerId="o-1"
@@ -24,7 +26,9 @@ describe("StatusControls", () => {
   });
 
   it("sends the chosen tier once confirmed", async () => {
-    const suspend = vi.fn(async (): Promise<FormState> => ({}));
+    const suspend = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(
       <StatusControls
         ownerId="o-1"
@@ -51,7 +55,9 @@ describe("StatusControls", () => {
   });
 
   it("backs out of a pending suspension", async () => {
-    const suspend = vi.fn(async (): Promise<FormState> => ({}));
+    const suspend = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(
       <StatusControls
         ownerId="o-1"
@@ -69,7 +75,9 @@ describe("StatusControls", () => {
   });
 
   it("offers reinstatement — and only that — for a suspended owner", async () => {
-    const reinstate = vi.fn(async (): Promise<FormState> => ({}));
+    const reinstate = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
     render(
       <StatusControls
         ownerId="o-1"

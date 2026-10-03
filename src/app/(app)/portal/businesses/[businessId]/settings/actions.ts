@@ -65,6 +65,8 @@ export async function saveBusinessSettingsAction(
       taxRate,
       serviceChargeRate,
       dayStartTime,
+      dailySummaryEnabled: formData.get("dailySummaryEnabled") === "on",
+      blindCloseEnabled: formData.get("blindCloseEnabled") === "on",
       expiryWarningDays,
       allowMiscItems: formData.get("allowMiscItems") === "on",
       receiptHeader: String(formData.get("receiptHeader") ?? ""),

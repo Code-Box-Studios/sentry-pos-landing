@@ -4,14 +4,16 @@ import { redirect } from "next/navigation";
 import { login } from "@/lib/api/auth";
 import { writePreauthToken, writeSession } from "@/lib/auth/session";
 import { toFormState, type FormState } from "@/lib/forms/form-state";
+import { managerPathAllowed } from "@/lib/auth/portal-access";
 
 const FIELDS = ["email", "password"] as const;
 
 /** Only same-origin absolute paths are honoured, so `next` cannot become an open redirect. */
 function safeNext(candidate: FormDataEntryValue | null, role: string): string {
-  const home = role === "platform_admin" ? "/admin" : "/portal";
+  const home = role === "platform_admin" ? "/admin" : role === "manager" ? "/portal/manager" : "/portal";
   if (typeof candidate !== "string") return home;
   if (!candidate.startsWith("/") || candidate.startsWith("//")) return home;
+  if (role === "manager") return managerPathAllowed(candidate.split(/[?#]/)[0]) ? candidate : home;
   const admin = candidate.startsWith("/admin");
   // Sending an owner to an admin URL would only bounce off middleware. Go home instead.
   return admin === (role === "platform_admin") ? candidate : home;

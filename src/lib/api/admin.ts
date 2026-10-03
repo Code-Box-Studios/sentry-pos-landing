@@ -77,3 +77,24 @@ export function listBusinessActivity(
     query: { ...query },
   });
 }
+
+export interface PlatformMetrics {
+  owners: {
+    active: number;
+    suspended: number;
+    hardSuspended: number;
+    closed: number;
+    total: number;
+  };
+  businesses: number;
+  branches: number;
+  terminals: number;
+  openShifts: number;
+}
+export const getPlatformMetrics = () => apiFetch<PlatformMetrics>("/admin/metrics");
+export type InspectorSection =
+  "catalog" | "sales" | "payments" | "shifts" | "stock" | "counts" | "terminals";
+export const inspectBusiness = (id: string, section: InspectorSection, page = 1) =>
+  apiFetch<Paginated<Record<string, unknown>>>(`/admin/businesses/${id}/inspect`, {
+    query: { section, page, pageSize: 50 },
+  });

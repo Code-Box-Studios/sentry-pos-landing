@@ -62,6 +62,8 @@ export function LoginForm({
 
       <SubmitButton>Sign in</SubmitButton>
 
+      <p className="text-center text-sm"><a href="/login/staff" className="text-brand-green-dark hover:underline">Have a temporary staff PIN? Set up access</a></p>
+
       <p className="text-center text-sm">
         <a href="/forgot" className="text-brand-green-dark hover:underline">
           Forgot your password?

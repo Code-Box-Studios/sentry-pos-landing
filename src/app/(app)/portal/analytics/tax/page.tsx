@@ -1,3 +1,4 @@
+import { loadScope, loadAnalyticsChoices } from "../load-scope";
 import { EmptyState } from "@/components/app/empty-state";
 import { ScopeSelector } from "@/components/app/scope-selector";
 import { Alert } from "@/components/ui/alert";
@@ -5,9 +6,8 @@ import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { TBody, TD, TH, THead, TR, Table } from "@/components/ui/table";
 import { getTax } from "@/lib/api/analytics";
 import { ValidationError } from "@/lib/api/errors";
-import { listBranches, listBusinesses } from "@/lib/api/portal";
 import { formatPercentOr, formatPesosOr } from "@/lib/money";
-import { readScope, scopeQuery } from "../scope";
+import { scopeQuery } from "../scope";
 
 /**
  * §6 Tax summary.
@@ -26,12 +26,9 @@ export default async function TaxPage({
     to?: string;
   }>;
 }) {
-  const scope = readScope(await searchParams);
+  const scope = await loadScope(await searchParams);
 
-  const [businesses, branches] = await Promise.all([
-    listBusinesses(),
-    scope.businessId ? listBranches(scope.businessId) : Promise.resolve([]),
-  ]);
+  const { businesses, branches, role } = await loadAnalyticsChoices(scope.businessId);
 
   let report;
   try {
@@ -40,11 +37,7 @@ export default async function TaxPage({
     if (error instanceof ValidationError) {
       return (
         <div className="space-y-6">
-          <ScopeSelector
-            businesses={businesses}
-            branches={branches}
-            scope={scope}
-          />
+          <ScopeSelector businesses={businesses} branches={branches} scope={scope} role={role} />
           <Alert>{error.message}</Alert>
         </div>
       );
@@ -54,11 +47,7 @@ export default async function TaxPage({
 
   return (
     <div className="space-y-6">
-      <ScopeSelector
-        businesses={businesses}
-        branches={branches}
-        scope={scope}
-      />
+      <ScopeSelector businesses={businesses} branches={branches} scope={scope} role={role} />
 
       <Card>
         <CardHeader>
@@ -68,10 +57,7 @@ export default async function TaxPage({
         </CardHeader>
         <CardBody>
           {report.businesses.length === 0 ? (
-            <EmptyState
-              title="Nothing to report"
-              body="No completed sales fall in this period."
-            />
+            <EmptyState title="Nothing to report" body="No completed sales fall in this period." />
           ) : (
             <Table>
               <THead>
@@ -89,24 +75,14 @@ export default async function TaxPage({
                 {report.businesses.map((row) => (
                   <TR key={row.businessId}>
                     <TD className="text-charcoal">{row.name}</TD>
-                    <TD className="text-right tabular-nums">
-                      {formatPercentOr(row.taxRate)}
-                    </TD>
-                    <TD className="text-right tabular-nums">
-                      {formatPesosOr(row.vatableSalesC)}
-                    </TD>
-                    <TD className="text-right tabular-nums">
-                      {formatPesosOr(row.vatC)}
-                    </TD>
+                    <TD className="text-right tabular-nums">{formatPercentOr(row.taxRate)}</TD>
+                    <TD className="text-right tabular-nums">{formatPesosOr(row.vatableSalesC)}</TD>
+                    <TD className="text-right tabular-nums">{formatPesosOr(row.vatC)}</TD>
                     <TD className="text-right tabular-nums">
                       {formatPesosOr(row.vatExemptSalesC)}
                     </TD>
-                    <TD className="text-right tabular-nums">
-                      {formatPesosOr(row.scPwdDiscountC)}
-                    </TD>
-                    <TD className="text-right tabular-nums">
-                      {formatPesosOr(row.serviceChargeC)}
-                    </TD>
+                    <TD className="text-right tabular-nums">{formatPesosOr(row.scPwdDiscountC)}</TD>
+                    <TD className="text-right tabular-nums">{formatPesosOr(row.serviceChargeC)}</TD>
                   </TR>
                 ))}
                 <TR>

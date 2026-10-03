@@ -18,5 +18,6 @@ export async function unpairTerminalAction(
   }
 
   revalidatePath(`/portal/businesses/${businessId}/terminals`);
+  revalidatePath("/portal/manager/terminals");
   return { done: true };
 }

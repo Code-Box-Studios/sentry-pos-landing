@@ -44,7 +44,8 @@ export async function apiFetch<T>(path: string, init: ApiRequestInit = {}): Prom
   }
 
   const headers = new Headers({ accept: "application/json" });
-  if (body !== undefined) headers.set("content-type", "application/json");
+  if (body !== undefined && !(body instanceof FormData))
+    headers.set("content-type", "application/json");
 
   const bearer = token ?? (authenticated ? await readAccessToken() : null);
   if (authenticated && !bearer) {
@@ -58,7 +59,7 @@ export async function apiFetch<T>(path: string, init: ApiRequestInit = {}): Prom
     response = await fetch(url, {
       method,
       headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: body instanceof FormData ? body : body === undefined ? undefined : JSON.stringify(body),
       // Portal data is per-user and frequently mutated; a cached read here would be a
       // cross-user leak at worst and a stale screen at best.
       cache: "no-store",
