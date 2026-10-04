@@ -10,7 +10,7 @@ import { Media } from "./cms/collections/Media";
 import { LandingContent } from "./cms/globals/LandingContent";
 import { cmsStorageOptions } from "./cms/storage/config";
 import { LegalPages } from "./cms/globals/LegalPages";
-import { disabledEmail } from "./cms/email/disabled";
+import { cmsEmailAdapter } from "./cms/email/config";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -29,7 +29,7 @@ export default buildConfig({
   collections: [CmsUsers, Media],
   globals: [LandingContent, LegalPages],
   plugins: [s3Storage(cmsStorageOptions())],
-  email: process.env.MAIL_ENABLED === "false" ? disabledEmail : undefined,
+  email: cmsEmailAdapter(),
   upload: { limits: { fileSize: 4 * 1024 * 1024 } },
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET ?? "",
