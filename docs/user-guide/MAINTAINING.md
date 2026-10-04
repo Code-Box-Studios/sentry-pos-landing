@@ -14,7 +14,7 @@ The twelve Markdown chapters in this directory are the editable source for the p
    /tmp/sentry-guide-tools/bin/python scripts/build-user-guide.py
    ```
 
-4. Open `/docs` in a local application browser. Confirm task search, chapter links, phone layout and PDF download. The site rewrite preserves the `/docs` address while serving the generated HTML.
+4. Open `/docs` in a local application browser. Confirm task search, chapter links, phone layout, theme switching and PDF download. The theme initially follows the device setting; the sun/moon button saves a choice in local storage under `sentry-docs-theme`. Verify both themes and refresh persistence. Printing always uses the light palette. The site rewrite preserves the `/docs` address while serving the generated HTML.
 5. Refresh `public/docs/SentryPOS-User-Guide.pdf` from the same content when instructions change. Print all chapters using the guide's print stylesheet and keep chapter bookmarks/page numbers when exporting.
 6. Run the application's tests, lint and build, then commit the Markdown changes and generated outputs together. Deploy through the existing Vercel project.
 
