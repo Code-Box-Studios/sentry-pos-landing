@@ -37,7 +37,7 @@ export function TopNav({
           : "border-transparent bg-transparent"
       }`}
     >
-      <nav className="mx-auto flex w-full max-w-[1280px] items-center gap-5 lg:gap-7">
+      <nav className="mx-auto flex w-full max-w-[1280px] items-center gap-3 md:gap-5 lg:gap-7">
         <a href="#top" className="flex items-center gap-[9px]" aria-label="Sentry — back to top">
           <span className="relative block size-7">
             <Image
@@ -79,6 +79,15 @@ export function TopNav({
             {link.label}
           </a>
         ))}
+
+        <a
+          href="/docs"
+          className={`text-sm font-medium no-underline transition-colors duration-250 ${
+            solid ? "text-slate hover:text-ink" : "text-white/85 hover:text-white"
+          }`}
+        >
+          Docs
+        </a>
 
         <span
           aria-hidden

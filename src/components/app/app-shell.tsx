@@ -27,7 +27,10 @@ export function AppShell({
       </aside>
 
       <div className="flex min-w-0 flex-col">
-        <header className="flex items-center justify-end border-b border-hairline bg-card px-6 py-3">
+        <header className="flex items-center justify-end gap-6 border-b border-hairline bg-card px-6 py-3">
+          <a href="/docs" className="text-sm text-steel hover:text-charcoal hover:underline">
+            Docs
+          </a>
           <a href="/logout" className="text-sm text-steel hover:text-charcoal hover:underline">
             Sign out
           </a>

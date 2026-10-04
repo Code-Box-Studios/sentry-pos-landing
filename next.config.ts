@@ -7,6 +7,9 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
   experimental: { serverActions: { bodySizeLimit: "5mb" } },
+  async rewrites() {
+    return [{ source: "/docs", destination: "/docs/index.html" }];
+  },
   // The portal is server-rendered — unlike pos/, which is a static export.
   images: {
     formats: ["image/avif", "image/webp"],
