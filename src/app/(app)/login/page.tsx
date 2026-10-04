@@ -1,4 +1,4 @@
-import { AuthCard } from "@/components/app/auth-card";
+import { SignInShell } from "./sign-in-shell";
 import { loginAction } from "./actions";
 import { LoginForm } from "./login-form";
 
@@ -9,8 +9,8 @@ export default async function LoginPage({
 }) {
   const { next } = await searchParams;
   return (
-    <AuthCard title="Sign in to Sentry">
+    <SignInShell>
       <LoginForm action={loginAction} next={next} />
-    </AuthCard>
+    </SignInShell>
   );
 }

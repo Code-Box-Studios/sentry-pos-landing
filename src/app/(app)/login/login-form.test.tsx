@@ -5,6 +5,36 @@ import { LoginForm } from "./login-form";
 import type { FormState } from "@/lib/forms/form-state";
 
 describe("LoginForm", () => {
+  it("reveals the password without submitting or losing the entered credentials", async () => {
+    const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
+      async () => ({}),
+    );
+    render(<LoginForm action={action} />);
+
+    await userEvent.type(screen.getByLabelText("Email address"), "maria@kapediaria.ph");
+    const password = screen.getByLabelText("Password");
+    await userEvent.type(password, "sentry-demo");
+    expect(password).toHaveAttribute("type", "password");
+
+    await userEvent.click(screen.getByRole("button", { name: "Show password" }));
+    expect(password).toHaveAttribute("type", "text");
+    expect(password).toHaveValue("sentry-demo");
+    expect(screen.getByRole("button", { name: "Hide password" })).toHaveAttribute(
+      "aria-pressed", "true",
+    );
+    expect(action).not.toHaveBeenCalled();
+
+    await userEvent.click(screen.getByRole("button", { name: "Hide password" }));
+    expect(password).toHaveAttribute("type", "password");
+    expect(password).toHaveValue("sentry-demo");
+
+    await userEvent.click(screen.getByRole("button", { name: "Show password" }));
+    await userEvent.click(screen.getByRole("button", { name: "Sign in" }));
+    const formData = action.mock.calls[0][1] as FormData;
+    expect(formData.get("email")).toBe("maria@kapediaria.ph");
+    expect(formData.get("password")).toBe("sentry-demo");
+  });
+
   it("submits what the user typed", async () => {
     const action = vi.fn<(state: FormState, form: FormData) => Promise<FormState>>(
       async () => ({}),
